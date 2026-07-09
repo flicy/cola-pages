@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>灵偶 OWLING — 孵化你自己的小精灵</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="灵偶 OWLING：每个孩子都有一只属于自己的学习精灵。它从一颗蛋开始，被你的声音唤醒，被你的故事喂养，陪你一起学英语。">
+    <meta property="og:title" content="灵偶 OWLING — 孵化你自己的小精灵">
+    <meta property="og:description" content="每个孩子都有一只属于自己的学习精灵。它从一颗蛋开始，被你的声音唤醒，被你的故事喂养。">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>">
     <style>
         *, *::before, *::after {
             margin: 0;
@@ -37,8 +39,19 @@
             scroll-behavior: smooth;
         }
 
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0;
+            background: linear-gradient(90deg, var(--purple), var(--blue), var(--gold));
+            z-index: 200;
+            transition: width 0.1s linear;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
             background: var(--bg-deep);
             color: var(--text-primary);
             line-height: 1.7;
@@ -125,18 +138,19 @@
             text-align: center;
             position: relative;
             padding: 60px 24px;
+            background:
+                linear-gradient(180deg, rgba(13, 13, 26, 0.25) 0%, rgba(13, 13, 26, 0.45) 55%, var(--bg-deep) 100%),
+                url('assets/spirit-egg-night.jpg') center 20% / cover no-repeat;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(123, 95, 255, 0.15) 0%, transparent 70%);
-            pointer-events: none;
+        .hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1,
+        .hero-tagline {
+            text-shadow: 0 2px 24px rgba(13, 13, 26, 0.8);
         }
 
         .hero-logo {
@@ -144,37 +158,13 @@
             font-weight: 600;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: var(--text-tertiary);
+            color: var(--text-primary);
             margin-bottom: 40px;
+            text-shadow: 0 1px 12px rgba(13, 13, 26, 0.9);
         }
 
-        .hero-egg {
-            font-size: 96px;
-            margin-bottom: 32px;
-            animation: float 3s ease-in-out infinite;
-            position: relative;
-            display: inline-block;
-        }
-
-        .hero-egg::before,
-        .hero-egg::after {
-            content: '✦';
-            position: absolute;
-            font-size: 16px;
-            color: var(--gold);
-            animation: sparkle 2s ease-in-out infinite;
-        }
-
-        .hero-egg::before {
-            top: 10px;
-            right: -10px;
-            animation-delay: 0.5s;
-        }
-
-        .hero-egg::after {
-            bottom: 20px;
-            left: -5px;
-            animation-delay: 1.2s;
+        .hero-spacer {
+            height: clamp(180px, 34vh, 320px);
         }
 
         .hero h1 {
@@ -833,6 +823,24 @@
             text-decoration: none;
             transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 4px 24px var(--purple-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -80%;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::after {
+            left: 130%;
         }
 
         .btn-primary:hover {
@@ -906,14 +914,25 @@
                 gap: 16px;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .fade-up { opacity: 1; transform: none; transition: none; }
+            .baby-spirit .spirit-icon, .cta-section .cta-icon,
+            .naming-ui .egg-crack, .scroll-cta .arrow, .spirits-meeting .sparkles { animation: none; }
+            .btn-primary::after { display: none; }
+        }
     </style>
+    <noscript><style>.fade-up { opacity: 1; transform: none; }</style></noscript>
 </head>
 <body>
+
+    <div class="progress" id="progress"></div>
 
     <!-- HERO -->
     <section class="hero">
         <div class="hero-logo fade-up">灵偶 OWLING</div>
-        <div class="hero-egg fade-up">🥚</div>
+        <div class="hero-spacer fade-up" aria-hidden="true"></div>
         <h1 class="fade-up">孵化你自己的小精灵<br>看它和你一起进化</h1>
         <p class="hero-tagline fade-up">每个孩子都有一只属于自己的学习精灵。<br>它从一颗蛋开始，被你的声音唤醒，被你的故事喂养。</p>
         <div class="scroll-cta fade-up" onclick="document.querySelector('.unboxing').scrollIntoView({behavior:'smooth'})">
@@ -1047,7 +1066,7 @@
                 <div class="evo-card fade-up">
                     <span class="evo-icon">🌟</span>
                     <div class="evo-level">LV.30+</div>
-                    <div class="evo-name">灵魂期</div>
+                    <div class="evo-name">共创期</div>
                     <div class="evo-desc">独特性格<br>共创故事<br>跨精灵社交</div>
                 </div>
             </div>
@@ -1060,8 +1079,8 @@
     <section class="memory">
         <div class="container">
             <div class="section-label fade-up">记忆水晶</div>
-            <h2 class="section-title fade-up">它记得你的一切</h2>
-            <p class="section-desc fade-up">每段对话变成一颗水晶，储存在它的记忆宝库里。</p>
+            <h2 class="section-title fade-up">它记得你们的故事</h2>
+            <p class="section-desc fade-up">每段对话变成一颗水晶，储存在你们共同的记忆宝库里。家长可以随时查看和删除。</p>
 
             <div class="crystal-grid fade-up">
                 <div class="crystal">
@@ -1161,7 +1180,7 @@
             <div class="section-label fade-up">精灵社交</div>
             <h2 class="section-title fade-up">让它交个朋友</h2>
             <p class="section-desc fade-up">两只精灵碰碰鼻子，就成了朋友。</p>
-            <p class="section-desc fade-up">它们会一起冒险、一起学英语、互相串门讲故事。伙伴等级越高，能一起解锁的副本越多。</p>
+            <p class="section-desc fade-up">它们会一起冒险、一起学英语、互相串门讲故事。一起玩得越久，能共同创作的故事越多。</p>
 
             <div class="social-visual fade-up">
                 <div class="spirits-meeting">
@@ -1172,7 +1191,7 @@
                 <div class="social-features">
                     <div class="social-feat">🗺️ 一起冒险</div>
                     <div class="social-feat">📖 互相讲故事</div>
-                    <div class="social-feat">🏆 组队解锁副本</div>
+                    <div class="social-feat">🏆 组队故事冒险</div>
                     <div class="social-feat">💌 跨精灵串门</div>
                 </div>
             </div>
@@ -1188,7 +1207,7 @@
             <div class="safety-grid">
                 <div class="safety-item fade-up">
                     <span class="safety-icon">🔒</span>
-                    <span class="safety-label">本地语音<br>隐私优先</span>
+                    <span class="safety-label">隐私优先<br>数据可查可删</span>
                 </div>
                 <div class="safety-item fade-up">
                     <span class="safety-icon">👑</span>
@@ -1247,6 +1266,13 @@
         document.querySelectorAll('.fade-up').forEach(el => {
             observer.observe(el);
         });
+
+        // Scroll progress
+        const progressEl = document.getElementById('progress');
+        window.addEventListener('scroll', () => {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            progressEl.style.width = (docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0) + '%';
+        }, { passive: true });
     </script>
 </body>
 </html>

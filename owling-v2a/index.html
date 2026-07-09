@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>灵偶 OWLING — 种下第一棵树，陪它一起长大</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="灵偶 OWLING：一只会说话的玩偶，一棵记录成长的故事树。每天的对话变成记忆叶子，陪孩子在故事里自然学英语。">
+<meta property="og:title" content="灵偶 OWLING — 种下第一棵树，陪它一起长大">
+<meta property="og:description" content="一只会说话的玩偶，一棵记录成长的故事树。每天的对话变成记忆叶子，陪孩子在故事里自然学英语。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌳</text></svg>">
 <style>
 *, *::before, *::after {
   box-sizing: border-box;
@@ -16,18 +18,24 @@
 
 :root {
   --cream: #FFFBF5;
+  --cream-deep: #FFF6E9;
   --green: #4A9B7F;
+  --green-deep: #37795F;
   --green-light: #6BB89E;
   --gold: #E8A838;
   --brown: #8B6F5C;
   --brown-light: #A8917F;
   --leaf: #7BC47F;
-  --text-primary: #2C2C2C;
-  --text-secondary: #5A5A5A;
-  --text-muted: #8A8A8A;
-  --shadow: 0 4px 24px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.08);
+  --ink: #26261F;
+  --ink-soft: #5A5A52;
+  --ink-mute: #90908A;
+  --line: rgba(74, 90, 60, 0.12);
+  --card: #FFFFFF;
+  --shadow: 0 2px 10px rgba(60, 60, 30, 0.04), 0 12px 32px rgba(60, 70, 40, 0.06);
+  --shadow-hover: 0 4px 14px rgba(60, 60, 30, 0.06), 0 20px 48px rgba(60, 90, 50, 0.12);
   --radius: 20px;
+  --font-display: 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
 }
 
 html {
@@ -35,16 +43,109 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   background: var(--cream);
-  color: var(--text-primary);
+  color: var(--ink);
   line-height: 1.7;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  background: rgba(123, 196, 127, 0.35);
+}
+
+/* ---------- Scroll progress ---------- */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--leaf), var(--green), var(--gold));
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ---------- Nav ---------- */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: rgba(255, 251, 245, 0.72);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.nav.scrolled {
+  border-bottom-color: var(--line);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--brown);
+  text-decoration: none;
+}
+
+.nav-logo .mark {
+  font-size: 1.1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--green-deep);
+}
+
+.nav-cta {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: var(--green);
+  padding: 8px 18px;
+  border-radius: 100px;
+  box-shadow: 0 2px 10px rgba(74, 155, 127, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(74, 155, 127, 0.42);
+}
+
+@media (max-width: 720px) {
+  .nav-links li:not(.nav-cta-li) { display: none; }
+}
+
+/* ---------- Layout primitives ---------- */
 .section {
   min-height: 100vh;
-  padding: 80px 24px;
+  padding: 110px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,38 +154,95 @@ body {
 }
 
 .section-inner {
-  max-width: 680px;
+  max-width: 700px;
   width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-.section-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 12px;
+  color: var(--green-deep);
+  margin-bottom: 14px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--leaf);
+  box-shadow: 0 0 0 3px rgba(123, 196, 127, 0.25);
+}
+
+.eyebrow .num {
+  color: var(--ink-mute);
+  font-weight: 500;
 }
 
 .section-title {
-  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
   font-weight: 700;
   margin-bottom: 20px;
-  line-height: 1.3;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
 }
 
 .section-text {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
+  font-size: 1.02rem;
+  color: var(--ink-soft);
   margin-bottom: 16px;
-  line-height: 1.8;
+  line-height: 1.9;
 }
 
+/* ---------- Card primitive (devl-style: thin border + corner wash) ---------- */
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.3s;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -30%;
+  width: 70%;
+  height: 90%;
+  background: radial-gradient(circle, rgba(123, 196, 127, 0.14) 0%, transparent 68%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(74, 155, 127, 0.3);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ---------- Reveal animation ---------- */
 .fade-in {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fade-in.visible {
@@ -92,75 +250,175 @@ body {
   transform: translateY(0);
 }
 
-.fade-in-delay-1 { transition-delay: 0.15s; }
-.fade-in-delay-2 { transition-delay: 0.3s; }
-.fade-in-delay-3 { transition-delay: 0.45s; }
-.fade-in-delay-4 { transition-delay: 0.6s; }
+.fade-in-delay-1 { transition-delay: 0.12s; }
+.fade-in-delay-2 { transition-delay: 0.24s; }
+.fade-in-delay-3 { transition-delay: 0.36s; }
+.fade-in-delay-4 { transition-delay: 0.48s; }
 
-/* Hero */
+/* ---------- Hero ---------- */
 .hero {
-  background: linear-gradient(180deg, #FFFBF5 0%, #FFF8ED 100%);
+  background:
+    radial-gradient(ellipse 60% 45% at 18% 12%, rgba(123, 196, 127, 0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 40% at 85% 30%, rgba(232, 168, 56, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(107, 184, 158, 0.10) 0%, transparent 70%),
+    linear-gradient(180deg, #FFFBF5 0%, #FFF8ED 100%);
   text-align: center;
   min-height: 100vh;
 }
 
-.hero-logo {
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  color: var(--brown);
-  margin-bottom: 40px;
+.floating-leaf {
+  position: absolute;
+  font-size: 1.3rem;
+  opacity: 0.5;
+  animation: drift 14s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.hero-visual {
-  font-size: 4rem;
-  margin-bottom: 32px;
-  display: flex;
+.floating-leaf:nth-of-type(1) { top: 16%; left: 8%; animation-delay: 0s; }
+.floating-leaf:nth-of-type(2) { top: 28%; right: 10%; animation-delay: -3.5s; font-size: 1rem; }
+.floating-leaf:nth-of-type(3) { bottom: 22%; left: 14%; animation-delay: -7s; font-size: 1.1rem; }
+.floating-leaf:nth-of-type(4) { bottom: 30%; right: 16%; animation-delay: -10s; }
+.floating-leaf:nth-of-type(5) { top: 48%; left: 4%; animation-delay: -5s; font-size: 0.9rem; }
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(12px, -18px) rotate(8deg); }
+  50% { transform: translate(-8px, -30px) rotate(-6deg); }
+  75% { transform: translate(-16px, -12px) rotate(4deg); }
+}
+
+.hero-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--green-deep);
+  background: rgba(123, 196, 127, 0.14);
+  border: 1px solid rgba(123, 196, 127, 0.35);
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 32px;
 }
 
-.hero-visual .arrow {
-  font-size: 1.5rem;
-  color: var(--text-muted);
+.hero-badge .pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--leaf);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(123, 196, 127, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(123, 196, 127, 0); }
+}
+
+.hero-illustration {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto 36px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(60, 90, 50, 0.14), 0 30px 80px rgba(60, 90, 50, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.hero-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.012) translateY(-4px); }
 }
 
 .hero-tagline {
-  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6.5vw, 3.3rem);
   font-weight: 700;
-  margin-bottom: 16px;
-  line-height: 1.3;
-  background: linear-gradient(135deg, var(--green), var(--brown));
+  margin-bottom: 20px;
+  line-height: 1.32;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, var(--green-deep) 10%, var(--green) 45%, var(--brown) 95%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .hero-sub {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-  margin-bottom: 48px;
+  font-size: 1.08rem;
+  color: var(--ink-mute);
+  margin-bottom: 44px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .cta-scroll {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 28px;
+  padding: 14px 30px;
   background: var(--green);
   color: white;
   border-radius: 100px;
   text-decoration: none;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(74,155,127,0.3);
+  box-shadow: 0 4px 16px rgba(74, 155, 127, 0.32);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-scroll::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
 }
 
 .cta-scroll:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(74,155,127,0.4);
+  box-shadow: 0 8px 28px rgba(74, 155, 127, 0.45);
+}
+
+.cta-scroll:hover::after {
+  left: 130%;
+}
+
+.cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 30px;
+  background: transparent;
+  color: var(--green-deep);
+  border: 1px solid rgba(74, 155, 127, 0.4);
+  border-radius: 100px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.cta-ghost:hover {
+  background: rgba(123, 196, 127, 0.1);
+  border-color: var(--green);
 }
 
 .cta-scroll .arrow-down {
@@ -172,15 +430,28 @@ body {
   50% { transform: translateY(4px); }
 }
 
-/* Section 2: Unboxing */
+/* ---------- Unboxing ---------- */
 .unboxing {
   background: linear-gradient(180deg, #FFF8ED 0%, #FFFBF5 100%);
 }
 
-.gift-visual {
-  text-align: center;
-  font-size: 5rem;
-  margin-bottom: 32px;
+.unbox-photo {
+  margin-bottom: 36px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-hover);
+}
+
+.unbox-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.unbox-photo:hover img {
+  transform: scale(1.03);
 }
 
 .unboxing-items {
@@ -193,34 +464,34 @@ body {
 .unboxing-item {
   flex: 1;
   min-width: 200px;
-  background: white;
-  border-radius: var(--radius);
-  padding: 28px 24px;
+  padding: 30px 24px;
   text-align: center;
-  box-shadow: var(--shadow);
 }
 
 .unboxing-item .emoji {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   margin-bottom: 12px;
 }
 
 .unboxing-item .label {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  font-weight: 600;
 }
 
-/* Section 3: Initialize */
+.unboxing-item .sub {
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+  margin-top: 4px;
+}
+
+/* ---------- Initialize ---------- */
 .initialize {
   background: linear-gradient(180deg, #FFFBF5 0%, #F8FFF5 100%);
 }
 
 .mock-input {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--shadow);
+  padding: 26px;
   margin: 28px 0;
   display: flex;
   align-items: center;
@@ -228,15 +499,16 @@ body {
 }
 
 .mock-avatar {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   background: linear-gradient(135deg, var(--green-light), var(--leaf));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(107, 184, 158, 0.35);
 }
 
 .mock-field {
@@ -245,17 +517,18 @@ body {
 
 .mock-field .label {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--ink-mute);
   margin-bottom: 4px;
 }
 
 .mock-field .value {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--green);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--green-deep);
   border-bottom: 2px solid var(--green-light);
   padding-bottom: 4px;
   display: inline-block;
+  font-family: var(--font-display);
 }
 
 .mock-field .cursor {
@@ -263,7 +536,7 @@ body {
   width: 2px;
   height: 1.2em;
   background: var(--green);
-  margin-left: 2px;
+  margin-left: 3px;
   animation: blink 1s infinite;
   vertical-align: text-bottom;
 }
@@ -275,58 +548,126 @@ body {
 
 .seed-visual {
   text-align: center;
-  margin-top: 24px;
-  font-size: 1.5rem;
+  margin-top: 28px;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
 }
 
-/* Section 4: Conversation */
+.seed-visual .seed {
+  display: inline-block;
+  animation: sprout 3s ease-in-out infinite;
+}
+
+@keyframes sprout {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.1); }
+}
+
+/* ---------- Conversation ---------- */
 .conversation {
   background: linear-gradient(180deg, #F8FFF5 0%, #F2FCF2 100%);
 }
 
-.chat-bubbles {
+.chat-window {
   margin: 28px 0;
+  padding: 24px;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.chat-header .dot-group {
+  display: flex;
+  gap: 5px;
+}
+
+.chat-header .dot-group span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.chat-header .chat-title {
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+  margin-left: auto;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.chat-bubbles {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .bubble {
-  max-width: 80%;
-  padding: 14px 20px;
+  max-width: 82%;
+  padding: 13px 18px;
   border-radius: 18px;
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .bubble-child {
   align-self: flex-end;
-  background: var(--green);
+  background: linear-gradient(135deg, var(--green), var(--green-deep));
   color: white;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 3px 10px rgba(74, 155, 127, 0.25);
 }
 
 .bubble-owl {
   align-self: flex-start;
-  background: white;
-  color: var(--text-primary);
-  border-bottom-left-radius: 4px;
-  box-shadow: var(--shadow);
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 5px;
 }
 
 .bubble-owl .en {
   display: block;
   margin-top: 6px;
   font-size: 0.85rem;
-  color: var(--green);
+  color: var(--green-deep);
   font-style: italic;
 }
 
+.bubble-typing {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 5px;
+  display: inline-flex;
+  gap: 5px;
+  padding: 15px 18px;
+}
+
+.bubble-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-light);
+  animation: typing 1.3s ease-in-out infinite;
+}
+
+.bubble-typing span:nth-child(2) { animation-delay: 0.18s; }
+.bubble-typing span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
 .leaf-card {
-  background: white;
-  border-radius: var(--radius);
   padding: 20px 24px;
-  box-shadow: var(--shadow);
   margin-top: 24px;
   display: flex;
   align-items: center;
@@ -336,6 +677,12 @@ body {
 
 .leaf-card .leaf-emoji {
   font-size: 2rem;
+  animation: sway 4s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
 }
 
 .leaf-card .leaf-content {
@@ -344,27 +691,28 @@ body {
 
 .leaf-card .leaf-date {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--ink-mute);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 .leaf-card .leaf-text {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-size: 0.92rem;
+  color: var(--ink-soft);
   margin-top: 4px;
 }
 
 .leaf-card .leaf-word {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: 8px;
   background: #E8F5E9;
-  color: var(--green);
+  color: var(--green-deep);
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 100px;
 }
 
-/* Section 5: Story Tree */
+/* ---------- Story Tree ---------- */
 .story-tree {
   background: linear-gradient(180deg, #F2FCF2 0%, #EDF8ED 100%);
 }
@@ -374,10 +722,15 @@ body {
   text-align: center;
 }
 
-.tree-svg {
-  max-width: 320px;
+.tree-illustration {
+  max-width: 520px;
   width: 100%;
+  height: auto;
   margin: 0 auto;
+  display: block;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 32px rgba(74, 155, 127, 0.18), 0 32px 72px rgba(74, 155, 127, 0.10);
 }
 
 .tree-branches {
@@ -389,15 +742,23 @@ body {
 }
 
 .branch-tag {
-  background: white;
+  background: #fff;
+  border: 1px solid var(--line);
   border-radius: 100px;
   padding: 10px 18px;
   font-size: 0.85rem;
   font-weight: 500;
-  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s, box-shadow 0.25s;
+  cursor: default;
+}
+
+.branch-tag:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: rgba(74, 155, 127, 0.4);
+  box-shadow: 0 6px 16px rgba(74, 155, 127, 0.14);
 }
 
 .branch-tag .dot {
@@ -406,7 +767,7 @@ body {
   border-radius: 50%;
 }
 
-/* Section 6: Interest Map */
+/* ---------- Interest Map ---------- */
 .interest-map {
   background: linear-gradient(180deg, #EDF8ED 0%, #F5FDF5 100%);
 }
@@ -419,16 +780,8 @@ body {
 }
 
 .map-cell {
-  background: white;
-  border-radius: var(--radius);
-  padding: 24px;
+  padding: 26px 22px;
   text-align: center;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s;
-}
-
-.map-cell:hover {
-  transform: scale(1.03);
 }
 
 .map-cell .emoji {
@@ -437,45 +790,70 @@ body {
 }
 
 .map-cell .name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .map-cell .density {
   font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-top: 4px;
+  color: var(--ink-mute);
+  margin: 6px 0 10px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+.map-cell .meter {
+  height: 5px;
+  border-radius: 100px;
+  background: rgba(123, 196, 127, 0.16);
+  overflow: hidden;
+}
+
+.map-cell .meter i {
+  display: block;
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--leaf), var(--green));
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+.map-cell.visible-meter .meter i {
+  width: var(--w, 50%);
 }
 
 .map-cell.dense {
-  background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+  background: linear-gradient(135deg, #F0FAF1, #E2F3E4);
 }
 
-/* Section 7: Parents */
+/* ---------- Parents ---------- */
 .parents {
   background: linear-gradient(180deg, #F5FDF5 0%, #FFFBF5 100%);
 }
 
 .parent-dashboard {
-  background: white;
-  border-radius: var(--radius);
   padding: 28px;
-  box-shadow: var(--shadow-lg);
   margin: 28px 0;
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .dash-item {
   text-align: center;
-  padding: 16px 8px;
-  border-radius: 12px;
+  padding: 18px 10px;
+  border-radius: 14px;
   background: var(--cream);
+  border: 1px solid transparent;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.dash-item:hover {
+  border-color: rgba(232, 168, 56, 0.35);
+  background: #FFFDF8;
 }
 
 .dash-item .icon {
@@ -484,14 +862,15 @@ body {
 }
 
 .dash-item .label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  font-size: 0.72rem;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
 }
 
 .dash-item .value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
   margin-top: 4px;
 }
 
@@ -503,22 +882,20 @@ body {
 }
 
 .parent-card {
-  background: white;
-  border-radius: 16px;
   padding: 18px 22px;
-  box-shadow: var(--shadow);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
   border-left: 3px solid var(--gold);
+  border-radius: 14px;
 }
 
 .parent-card .highlight {
-  color: var(--green);
-  font-weight: 600;
+  color: var(--green-deep);
+  font-weight: 700;
 }
 
-/* Section 8: Companions */
+/* ---------- Companions ---------- */
 .companions {
   background: linear-gradient(180deg, #FFFBF5 0%, #FFF8ED 100%);
 }
@@ -527,8 +904,18 @@ body {
   text-align: center;
   font-size: 3rem;
   margin: 24px 0;
-  letter-spacing: 8px;
+  letter-spacing: 10px;
 }
+
+.forest-visual span {
+  display: inline-block;
+  animation: breathe 5s ease-in-out infinite;
+}
+
+.forest-visual span:nth-child(2) { animation-delay: -1s; }
+.forest-visual span:nth-child(3) { animation-delay: -2s; }
+.forest-visual span:nth-child(4) { animation-delay: -3s; }
+.forest-visual span:nth-child(5) { animation-delay: -4s; }
 
 .companion-features {
   display: flex;
@@ -538,15 +925,13 @@ body {
 }
 
 .companion-feature {
-  background: white;
-  border-radius: 14px;
   padding: 18px 22px;
-  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  border-radius: 16px;
 }
 
 .companion-feature .emoji {
@@ -554,7 +939,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Section 9: Safety */
+/* ---------- Safety ---------- */
 .safety {
   background: linear-gradient(180deg, #FFF8ED 0%, #FFFBF5 100%);
 }
@@ -567,11 +952,8 @@ body {
 }
 
 .safety-item {
-  background: white;
-  border-radius: var(--radius);
-  padding: 24px 20px;
+  padding: 26px 20px;
   text-align: center;
-  box-shadow: var(--shadow);
 }
 
 .safety-item .icon {
@@ -580,28 +962,32 @@ body {
 }
 
 .safety-item .label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .safety-item .desc {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  font-size: 0.76rem;
+  color: var(--ink-mute);
   margin-top: 6px;
 }
 
-/* Section 10: CTA */
+/* ---------- CTA ---------- */
 .final-cta {
-  background: linear-gradient(180deg, #FFFBF5 0%, #F2FCF2 100%);
+  background:
+    radial-gradient(ellipse 55% 40% at 30% 20%, rgba(123, 196, 127, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(232, 168, 56, 0.10) 0%, transparent 70%),
+    linear-gradient(180deg, #FFFBF5 0%, #F2FCF2 100%);
   text-align: center;
 }
 
 .cta-title {
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5.5vw, 2.7rem);
   font-weight: 700;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, var(--green), var(--gold));
+  background: linear-gradient(135deg, var(--green-deep), var(--gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -609,29 +995,44 @@ body {
 
 .cta-button {
   display: inline-block;
-  padding: 16px 40px;
+  padding: 16px 44px;
   background: var(--green);
   color: white;
   border-radius: 100px;
   text-decoration: none;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 700;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(74,155,127,0.3);
+  box-shadow: 0 4px 20px rgba(74, 155, 127, 0.32);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
 }
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(74,155,127,0.4);
+  box-shadow: 0 10px 36px rgba(74, 155, 127, 0.45);
+}
+
+.cta-button:hover::after {
+  left: 130%;
 }
 
 .cta-video {
   margin-top: 40px;
-  background: white;
-  border-radius: var(--radius);
   padding: 48px 32px;
-  box-shadow: var(--shadow);
-  color: var(--text-muted);
+  color: var(--ink-mute);
   font-size: 0.9rem;
 }
 
@@ -640,31 +1041,50 @@ body {
   margin-bottom: 12px;
 }
 
-/* Footer */
+/* ---------- Footer ---------- */
 .footer {
-  padding: 48px 24px;
+  padding: 56px 24px 40px;
   text-align: center;
   background: var(--cream);
-  border-top: 1px solid rgba(0,0,0,0.04);
+  border-top: 1px solid var(--line);
 }
 
 .footer-logo {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--brown);
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
 }
 
 .footer-tagline {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--ink-mute);
+  margin-bottom: 20px;
 }
 
-/* Responsive */
+.footer-links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  font-size: 0.78rem;
+  color: var(--ink-mute);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--green-deep);
+}
+
+/* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .section {
-    padding: 60px 20px;
+    padding: 90px 20px;
   }
 
   .unboxing-items {
@@ -691,44 +1111,86 @@ body {
   .bubble {
     max-width: 90%;
   }
+
+  .floating-leaf {
+    display: none;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fade-in { opacity: 1; transform: none; transition: none; }
+  .floating-leaf, .hero-illustration, .seed-visual .seed,
+  .leaf-card .leaf-emoji, .forest-visual span,
+  .cta-scroll .arrow-down, .hero-badge .pulse, .bubble-typing span,
+  .mock-field .cursor { animation: none; }
+  .unbox-photo img { transition: none; }
+  .card, .branch-tag, .cta-scroll, .cta-button { transition: none; }
+  .map-cell .meter i { transition: none; width: var(--w, 50%); }
 }
 </style>
+<noscript><style>.fade-in { opacity: 1; transform: none; } .map-cell .meter i { width: var(--w, 50%); }</style></noscript>
 </head>
 <body>
 
+<div class="progress" id="progress"></div>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <a href="#hero" class="nav-logo"><span class="mark">🦉</span>灵偶 OWLING</a>
+  <ul class="nav-links">
+    <li><a href="#conversation">对话</a></li>
+    <li><a href="#story-tree">故事树</a></li>
+    <li><a href="#parents">家长端</a></li>
+    <li><a href="#safety">安全</a></li>
+    <li class="nav-cta-li"><a href="http://mbp.liaoxingyi.com/" target="_blank" rel="noopener" class="nav-cta">体验 Demo</a></li>
+  </ul>
+</nav>
+
 <!-- 1. Hero -->
 <section class="section hero" id="hero">
+  <span class="floating-leaf">🍃</span>
+  <span class="floating-leaf">🍃</span>
+  <span class="floating-leaf">🌿</span>
+  <span class="floating-leaf">🍃</span>
+  <span class="floating-leaf">🌿</span>
   <div class="section-inner">
-    <div class="hero-logo fade-in">灵偶 OWLING</div>
-    <div class="hero-visual fade-in fade-in-delay-1">
-      <span>🌱</span>
-      <span class="arrow">→</span>
-      <span>🌳</span>
+    <div class="hero-badge fade-in"><span class="pulse"></span>探月黑客松 · AI 创意大赛</div>
+    <div class="hero-illustration fade-in fade-in-delay-1">
+      <img src="assets/hero-owl-tree.jpg" alt="灵偶猫头鹰玩偶坐在发光的故事树旁" width="1600" height="900">
     </div>
     <h1 class="hero-tagline fade-in fade-in-delay-2">种下第一棵树，<br>陪它一起长大</h1>
     <p class="hero-sub fade-in fade-in-delay-3">一只会说话的玩偶，一棵记录成长的故事树</p>
-    <a href="#unboxing" class="cta-scroll fade-in fade-in-delay-4">
-      看看它是怎么长大的
-      <span class="arrow-down">↓</span>
-    </a>
+    <div class="hero-actions fade-in fade-in-delay-4">
+      <a href="#unboxing" class="cta-scroll">
+        看看它是怎么长大的
+        <span class="arrow-down">↓</span>
+      </a>
+      <a href="http://mbp.liaoxingyi.com/" target="_blank" rel="noopener" class="cta-ghost">直接体验 Demo →</a>
+    </div>
   </div>
 </section>
 
 <!-- 2. 开箱 -->
 <section class="section unboxing" id="unboxing">
   <div class="section-inner">
-    <div class="gift-visual fade-in">🎁</div>
-    <p class="section-label fade-in">开箱 · UNBOX</p>
+    <div class="unbox-photo fade-in">
+      <img src="assets/owl-unbox.jpg" alt="毛绒猫头鹰玩偶和一张精致的小卡片" width="1200" height="900">
+    </div>
+    <p class="eyebrow fade-in"><span class="num">01</span>开箱 · UNBOX</p>
     <h2 class="section-title fade-in fade-in-delay-1">一份成长的礼物</h2>
     <p class="section-text fade-in fade-in-delay-2">爸爸妈妈送了你一个小伙伴。拆开盒子，里面是一只软软的玩偶，和一张神秘卡片。</p>
     <div class="unboxing-items fade-in fade-in-delay-3">
-      <div class="unboxing-item">
+      <div class="unboxing-item card">
         <div class="emoji">🧸</div>
         <div class="label">灵偶玩偶</div>
+        <div class="sub">孩子的对话入口</div>
       </div>
-      <div class="unboxing-item">
+      <div class="unboxing-item card">
         <div class="emoji">💳</div>
         <div class="label">神秘卡片</div>
+        <div class="sub">开启故事的钥匙</div>
       </div>
     </div>
   </div>
@@ -737,10 +1199,10 @@ body {
 <!-- 3. 初始化 -->
 <section class="section initialize" id="initialize">
   <div class="section-inner">
-    <p class="section-label fade-in">初始化 · ACTIVATE</p>
+    <p class="eyebrow fade-in"><span class="num">02</span>初始化 · ACTIVATE</p>
     <h2 class="section-title fade-in fade-in-delay-1">给它一个名字</h2>
     <p class="section-text fade-in fade-in-delay-2">扫描卡片，进入灵偶的世界。给它起一个只属于你们的名字。</p>
-    <div class="mock-input fade-in fade-in-delay-3">
+    <div class="mock-input card fade-in fade-in-delay-3">
       <div class="mock-avatar">🦉</div>
       <div class="mock-field">
         <div class="label">给你的灵偶起个名字</div>
@@ -748,30 +1210,37 @@ body {
       </div>
     </div>
     <p class="section-text fade-in fade-in-delay-3">从这一刻起，你们的故事开始了。</p>
-    <div class="seed-visual fade-in fade-in-delay-4">🌱 地上种下了第一颗种子。</div>
+    <div class="seed-visual fade-in fade-in-delay-4"><span class="seed">🌱</span> 地上种下了第一颗种子。</div>
   </div>
 </section>
 
 <!-- 4. 对话 -->
 <section class="section conversation" id="conversation">
   <div class="section-inner">
-    <p class="section-label fade-in">对话 · TALK</p>
+    <p class="eyebrow fade-in"><span class="num">03</span>对话 · TALK</p>
     <h2 class="section-title fade-in fade-in-delay-1">每天长出一片叶子</h2>
     <p class="section-text fade-in fade-in-delay-2">和它说话吧。今天发生了什么？学了什么新词？开心还是难过？</p>
-    <div class="chat-bubbles fade-in fade-in-delay-2">
-      <div class="bubble bubble-child">小叶小叶！今天我看到一只好大的蝴蝶！</div>
-      <div class="bubble bubble-owl">
-        哇！蝴蝶很美呢！你知道蝴蝶小时候是毛毛虫吗？
-        <span class="en">A butterfly starts as a caterpillar 🐛→🦋</span>
+    <div class="chat-window card fade-in fade-in-delay-2">
+      <div class="chat-header">
+        <div class="dot-group"><span></span><span></span><span></span></div>
+        <span class="chat-title">小叶 · 正在听</span>
       </div>
-      <div class="bubble bubble-child">真的吗！那毛毛虫英语怎么说？</div>
-      <div class="bubble bubble-owl">
-        Caterpillar! 跟我念一遍？Ca-ter-pil-lar 🐛
-        <span class="en">caterpillar = 毛毛虫</span>
+      <div class="chat-bubbles">
+        <div class="bubble bubble-child">小叶小叶！今天我看到一只好大的蝴蝶！</div>
+        <div class="bubble bubble-owl">
+          哇！蝴蝶很美呢！你知道蝴蝶小时候是毛毛虫吗？
+          <span class="en">A butterfly starts as a caterpillar 🐛→🦋</span>
+        </div>
+        <div class="bubble bubble-child">真的吗！那毛毛虫英语怎么说？</div>
+        <div class="bubble bubble-owl">
+          Caterpillar! 跟我念一遍？Ca-ter-pil-lar 🐛
+          <span class="en">caterpillar = 毛毛虫</span>
+        </div>
+        <div class="bubble-typing"><span></span><span></span><span></span></div>
       </div>
     </div>
     <p class="section-text fade-in fade-in-delay-3">每一次对话，都会长出一片新叶子。叶子上记着你们今天的故事。</p>
-    <div class="leaf-card fade-in fade-in-delay-4">
+    <div class="leaf-card card fade-in fade-in-delay-4">
       <div class="leaf-emoji">🍃</div>
       <div class="leaf-content">
         <div class="leaf-date">7月9日 · 开心 😊</div>
@@ -785,31 +1254,11 @@ body {
 <!-- 5. 故事树 -->
 <section class="section story-tree" id="story-tree">
   <div class="section-inner">
-    <p class="section-label fade-in">故事树 · STORY TREE</p>
+    <p class="eyebrow fade-in"><span class="num">04</span>故事树 · STORY TREE</p>
     <h2 class="section-title fade-in fade-in-delay-1">你们共同的记忆</h2>
     <p class="section-text fade-in fade-in-delay-2">叶子越来越多，树也越来越大。每一根枝干是一个话题，每一片叶子是一段故事。</p>
     <div class="tree-visual fade-in fade-in-delay-3">
-      <svg class="tree-svg" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Trunk -->
-        <path d="M150 360 L150 200 Q148 180 140 165" stroke="#8B6F5C" stroke-width="8" stroke-linecap="round" fill="none"/>
-        <path d="M150 260 Q170 240 185 220" stroke="#8B6F5C" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <path d="M150 230 Q130 210 115 195" stroke="#8B6F5C" stroke-width="5" stroke-linecap="round" fill="none"/>
-        <path d="M150 200 Q165 185 175 170" stroke="#8B6F5C" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <!-- Leaf clusters -->
-        <circle cx="130" cy="150" r="35" fill="#7BC47F" opacity="0.7"/>
-        <circle cx="170" cy="140" r="30" fill="#4A9B7F" opacity="0.6"/>
-        <circle cx="110" cy="120" r="25" fill="#6BB89E" opacity="0.7"/>
-        <circle cx="185" cy="115" r="28" fill="#7BC47F" opacity="0.6"/>
-        <circle cx="145" cy="100" r="32" fill="#4A9B7F" opacity="0.5"/>
-        <circle cx="120" cy="85" r="22" fill="#6BB89E" opacity="0.6"/>
-        <circle cx="175" cy="80" r="24" fill="#7BC47F" opacity="0.5"/>
-        <circle cx="150" cy="65" r="28" fill="#4A9B7F" opacity="0.6"/>
-        <circle cx="195" cy="160" r="22" fill="#6BB89E" opacity="0.5"/>
-        <!-- Highlight leaves -->
-        <circle cx="100" cy="145" r="8" fill="#E8A838" opacity="0.8"/>
-        <circle cx="190" cy="100" r="6" fill="#E8A838" opacity="0.7"/>
-        <circle cx="140" cy="75" r="7" fill="#E8A838" opacity="0.8"/>
-      </svg>
+      <img class="tree-illustration" src="assets/story-tree.jpg" alt="挂满发光记忆叶子的大故事树，树下小玩偶仰望" width="1200" height="900">
     </div>
     <p class="section-text fade-in fade-in-delay-3">这棵树，是你和灵偶一起写的。</p>
     <div class="tree-branches fade-in fade-in-delay-4">
@@ -825,29 +1274,33 @@ body {
 <!-- 6. 兴趣地图 -->
 <section class="section interest-map" id="interest-map">
   <div class="section-inner">
-    <p class="section-label fade-in">兴趣地图 · INTEREST MAP</p>
+    <p class="eyebrow fade-in"><span class="num">05</span>兴趣地图 · INTEREST MAP</p>
     <h2 class="section-title fade-in fade-in-delay-1">从天空俯瞰你的树</h2>
     <p class="section-text fade-in fade-in-delay-2">从上往下看你的树，你会看到：哪些区域最茂密，就是你最感兴趣的世界。</p>
     <div class="map-grid fade-in fade-in-delay-3">
-      <div class="map-cell dense">
+      <div class="map-cell card dense" style="--w: 100%">
         <div class="emoji">🦕</div>
         <div class="name">恐龙</div>
         <div class="density">32 片叶子</div>
+        <div class="meter"><i></i></div>
       </div>
-      <div class="map-cell">
+      <div class="map-cell card" style="--w: 56%">
         <div class="emoji">🎨</div>
         <div class="name">画画</div>
         <div class="density">18 片叶子</div>
+        <div class="meter"><i></i></div>
       </div>
-      <div class="map-cell">
+      <div class="map-cell card" style="--w: 75%">
         <div class="emoji">🚀</div>
         <div class="name">太空</div>
         <div class="density">24 片叶子</div>
+        <div class="meter"><i></i></div>
       </div>
-      <div class="map-cell dense">
+      <div class="map-cell card dense" style="--w: 88%">
         <div class="emoji">🍳</div>
         <div class="name">做饭</div>
         <div class="density">28 片叶子</div>
+        <div class="meter"><i></i></div>
       </div>
     </div>
   </div>
@@ -856,10 +1309,10 @@ body {
 <!-- 7. 家长端 -->
 <section class="section parents" id="parents">
   <div class="section-inner">
-    <p class="section-label fade-in">家长端 · PARENTS</p>
+    <p class="eyebrow fade-in"><span class="num">06</span>家长端 · PARENTS</p>
     <h2 class="section-title fade-in fade-in-delay-1">不用追问，也能懂他</h2>
-    
-    <div class="parent-dashboard fade-in fade-in-delay-2">
+
+    <div class="parent-dashboard card fade-in fade-in-delay-2">
       <div class="dashboard-grid">
         <div class="dash-item">
           <div class="icon">😊</div>
@@ -894,18 +1347,18 @@ body {
       </div>
     </div>
 
-    <p class="section-label fade-in fade-in-delay-3" style="margin-top: 36px;">主动提醒 · INSIGHTS</p>
+    <p class="eyebrow fade-in fade-in-delay-3" style="margin-top: 36px;">主动提醒 · INSIGHTS</p>
     <div class="parent-cards fade-in fade-in-delay-3">
-      <div class="parent-card">
+      <div class="parent-card card">
         悠悠今天学了 <span class="highlight">'butterfly'</span>，反复问了3次 <span class="highlight">'caterpillar'</span> 还没记住
       </div>
-      <div class="parent-card">
+      <div class="parent-card card">
         她提到和好朋友闹别扭了，今晚可以<span class="highlight">聊聊</span>
       </div>
-      <div class="parent-card">
+      <div class="parent-card card">
         他跟灵偶说想养一只小猫，要不要<span class="highlight">周末去看看</span>？
       </div>
-      <div class="parent-card">
+      <div class="parent-card card">
         本周故事树长了 <span class="highlight">8 片叶子</span>，比上周多了一倍！
       </div>
     </div>
@@ -915,22 +1368,22 @@ body {
 <!-- 8. 伙伴等级 -->
 <section class="section companions" id="companions">
   <div class="section-inner">
-    <p class="section-label fade-in">伙伴等级 · COMPANIONS</p>
+    <p class="eyebrow fade-in"><span class="num">07</span>伙伴等级 · COMPANIONS</p>
     <h2 class="section-title fade-in fade-in-delay-1">森林里不只有一棵树</h2>
-    <div class="forest-visual fade-in fade-in-delay-2">🌲🌳🌲🌳🌲</div>
+    <div class="forest-visual fade-in fade-in-delay-2"><span>🌲</span><span>🌳</span><span>🌲</span><span>🌳</span><span>🌲</span></div>
     <p class="section-text fade-in fade-in-delay-2">当两棵树靠近，就变成了一片小森林。你的灵偶可以和朋友的灵偶交朋友。一起讲故事、一起学英语、一起长大。</p>
     <div class="companion-features fade-in fade-in-delay-3">
-      <div class="companion-feature">
+      <div class="companion-feature card">
         <span class="emoji">📖</span>
         <span>一起讲故事 — 共同创作冒险篇章</span>
       </div>
-      <div class="companion-feature">
+      <div class="companion-feature card">
         <span class="emoji">🗣️</span>
         <span>一起学英语 — 互相教新单词</span>
       </div>
-      <div class="companion-feature">
+      <div class="companion-feature card">
         <span class="emoji">⭐</span>
-        <span>伙伴等级越高，能解锁的共同冒险越多</span>
+        <span>一起长大 — 陪伴越久，共同的冒险故事越多</span>
       </div>
     </div>
   </div>
@@ -939,30 +1392,30 @@ body {
 <!-- 9. 安全 -->
 <section class="section safety" id="safety">
   <div class="section-inner">
-    <p class="section-label fade-in">安全 · SAFETY</p>
+    <p class="eyebrow fade-in"><span class="num">08</span>安全 · SAFETY</p>
     <h2 class="section-title fade-in fade-in-delay-1">我们守护这片森林</h2>
     <div class="safety-grid fade-in fade-in-delay-2">
-      <div class="safety-item">
+      <div class="safety-item card">
         <div class="icon">🔒</div>
-        <div class="label">本地语音处理</div>
-        <div class="desc">语音数据不上云</div>
+        <div class="label">隐私优先设计</div>
+        <div class="desc">数据最小化收集，加密存储</div>
       </div>
-      <div class="safety-item">
+      <div class="safety-item card">
         <div class="icon">👨‍👩‍👧</div>
         <div class="label">家长全权管理</div>
         <div class="desc">记忆由家长掌控</div>
       </div>
-      <div class="safety-item">
+      <div class="safety-item card">
         <div class="icon">⏰</div>
         <div class="label">使用时长保护</div>
         <div class="desc">自动休息提醒</div>
       </div>
-      <div class="safety-item">
+      <div class="safety-item card">
         <div class="icon">🛡️</div>
         <div class="label">内容安全过滤</div>
         <div class="desc">多层内容审核</div>
       </div>
-      <div class="safety-item">
+      <div class="safety-item card">
         <div class="icon">🔘</div>
         <div class="label">物理开关</div>
         <div class="desc">一键断电静音</div>
@@ -975,8 +1428,8 @@ body {
 <section class="section final-cta" id="cta">
   <div class="section-inner">
     <h2 class="cta-title fade-in">种下你的第一棵树</h2>
-    <a href="http://mbp.liaoxingyi.com/" class="cta-button fade-in fade-in-delay-1">体验 Demo</a>
-    <div class="cta-video fade-in fade-in-delay-2">
+    <a href="http://mbp.liaoxingyi.com/" target="_blank" rel="noopener" class="cta-button fade-in fade-in-delay-1">体验 Demo</a>
+    <div class="cta-video card fade-in fade-in-delay-2">
       <div class="play-icon">▶️</div>
       <p>视频即将上线 · 7月10日</p>
     </div>
@@ -986,11 +1439,15 @@ body {
 <!-- 11. Footer -->
 <footer class="footer">
   <div class="footer-logo">灵偶 OWLING · 探月黑客松作品</div>
-  <p class="footer-tagline">不只是玩具，是陪你长大的朋友。</p>
+  <p class="footer-tagline">不只是玩具，是陪你长大的学习伙伴。</p>
+  <div class="footer-links">
+    <a href="http://mbp.liaoxingyi.com/" target="_blank" rel="noopener">体验 Demo</a>
+    <a href="https://github.com/flicy/owling-landing" target="_blank" rel="noopener">GitHub</a>
+  </div>
 </footer>
 
 <script>
-// IntersectionObserver for scroll animations
+// Scroll reveal
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -1005,6 +1462,31 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.fade-in').forEach(el => {
   observer.observe(el);
 });
+
+// Interest meter fill on reveal
+const meterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible-meter');
+      meterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+document.querySelectorAll('.map-cell').forEach(el => {
+  meterObserver.observe(el);
+});
+
+// Scroll progress + nav border
+const progressEl = document.getElementById('progress');
+const navEl = document.getElementById('nav');
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  progressEl.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+  navEl.classList.toggle('scrolled', scrollTop > 40);
+}, { passive: true });
 </script>
 </body>
 </html>

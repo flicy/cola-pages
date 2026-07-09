@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>灵偶 OWLING — 陪你长大的朋友</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>灵偶 OWLING — 陪你长大的学习伙伴</title>
+<meta name="description" content="灵偶 OWLING：一个会记住孩子每一天的 AI 学习伙伴。实时语音对话、成长记忆、英语启蒙，用故事和陪伴代替枯燥练习。">
+<meta property="og:title" content="灵偶 OWLING — 陪你长大的学习伙伴">
+<meta property="og:description" content="实时语音对话 · 成长记忆 · 英语启蒙。一个会记住孩子每一天的 AI 学习伙伴。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
 <style>
 *, *::before, *::after {
   margin: 0;
@@ -39,7 +42,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
   background: var(--cream);
   color: var(--text-primary);
   line-height: 1.6;
@@ -69,6 +72,18 @@ body {
 .fade-in-delay-2 { transition-delay: 0.2s; }
 .fade-in-delay-3 { transition-delay: 0.3s; }
 .fade-in-delay-4 { transition-delay: 0.4s; }
+
+/* Scroll progress */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--mint), var(--orange), var(--purple));
+  z-index: 200;
+  transition: width 0.1s linear;
+}
 
 /* Navigation */
 nav {
@@ -164,18 +179,23 @@ nav .nav-cta:hover {
 }
 
 .hero-plush {
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(135deg, #FFE4CC 0%, #FFF0E0 50%, #E8F8F2 100%);
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
   margin-bottom: 40px;
-  box-shadow: 0 20px 60px rgba(245,169,98,0.15);
+  box-shadow: 0 20px 60px rgba(245,169,98,0.25);
   animation: float 6s ease-in-out infinite;
   position: relative;
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+}
+
+.hero-plush img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 18% center;
 }
 
 .hero-plush::after {
@@ -244,6 +264,24 @@ nav .nav-cta:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btn-primary:hover::after {
+  left: 130%;
 }
 
 .btn-primary:hover {
@@ -714,9 +752,19 @@ footer .footer-logo {
   .dashboard-items { grid-template-columns: 1fr; }
   .safety-grid { grid-template-columns: 1fr; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fade-in { opacity: 1; transform: none; transition: none; }
+  .hero-plush { animation: none; }
+  .btn-primary::after { display: none; }
+}
 </style>
+<noscript><style>.fade-in { opacity: 1; transform: none; }</style></noscript>
 </head>
 <body>
+
+<div class="progress" id="progress"></div>
 
 <!-- Navigation -->
 <nav>
@@ -734,9 +782,11 @@ footer .footer-logo {
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-plush fade-in">🧸</div>
+  <div class="hero-plush fade-in">
+    <img src="assets/hero-owl.jpg" alt="灵偶毛绒猫头鹰玩偶" width="440" height="440">
+  </div>
   <h1 class="fade-in fade-in-delay-1">灵偶 <span class="highlight">OWLING</span></h1>
-  <p class="tagline fade-in fade-in-delay-2">不只是玩具，是陪你长大的朋友</p>
+  <p class="tagline fade-in fade-in-delay-2">不只是玩具，是陪你长大的学习伙伴</p>
   <p class="subtitle fade-in fade-in-delay-3">
     实时语音对话 · 成长记忆 · 英语启蒙<br>
     一个会记住孩子每一天的 AI 伙伴，用故事和陪伴代替枯燥练习
@@ -941,8 +991,8 @@ footer .footer-logo {
     <div class="safety-grid">
       <div class="safety-item fade-in fade-in-delay-1">
         <div class="safety-icon">🔒</div>
-        <h4>本地语音处理</h4>
-        <p>隐私优先，核心数据不出设备</p>
+        <h4>隐私优先设计</h4>
+        <p>数据最小化收集，加密存储传输</p>
       </div>
       <div class="safety-item fade-in fade-in-delay-2">
         <div class="safety-icon">👁️</div>
@@ -976,7 +1026,6 @@ footer .footer-logo {
       <p>体验 AI 伙伴如何用温度和记忆，重新定义儿童英语启蒙</p>
       <div class="cta-buttons">
         <a href="http://mbp.liaoxingyi.com/" target="_blank" class="btn-primary">体验 Demo →</a>
-        <a href="#" class="btn-secondary">加入等候名单</a>
       </div>
     </div>
   </div>
@@ -985,7 +1034,7 @@ footer .footer-logo {
 <!-- Footer -->
 <footer>
   <div class="footer-logo">灵偶 OWLING</div>
-  <p>© 2025 灵偶 OWLING. 用 AI 陪伴，让成长被看见。</p>
+  <p>© 2026 灵偶 OWLING. 用 AI 陪伴，让成长被看见。</p>
 </footer>
 
 <script>
@@ -1005,18 +1054,15 @@ document.querySelectorAll('.fade-in').forEach(el => {
   observer.observe(el);
 });
 
-// Smooth nav background on scroll
+// Smooth nav background + scroll progress
 const nav = document.querySelector('nav');
-let lastScroll = 0;
+const progressEl = document.getElementById('progress');
 
 window.addEventListener('scroll', () => {
   const currentScroll = window.pageYOffset;
-  if (currentScroll > 50) {
-    nav.style.borderBottomColor = 'rgba(0,0,0,0.08)';
-  } else {
-    nav.style.borderBottomColor = 'rgba(0,0,0,0.04)';
-  }
-  lastScroll = currentScroll;
+  nav.style.borderBottomColor = currentScroll > 50 ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.04)';
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  progressEl.style.width = (docHeight > 0 ? (currentScroll / docHeight) * 100 : 0) + '%';
 }, { passive: true });
 </script>
 </body>
