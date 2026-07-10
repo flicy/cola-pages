@@ -1129,6 +1129,193 @@ body {
   .card, .branch-tag, .cta-scroll, .cta-button { transition: none; }
   .map-cell .meter i { transition: none; width: var(--w, 50%); }
 }
+/* === CSS Illustrations === */
+.css-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* Hero: Owl + Glowing Tree */
+.hero-owl-scene {
+  width: 100%;
+  max-width: 700px;
+  height: 320px;
+  background: linear-gradient(180deg, #1a2a1a 0%, #0d1f12 60%, #162b16 100%);
+  margin: 0 auto;
+}
+.hero-owl-scene .owl-body {
+  font-size: 80px;
+  position: absolute;
+  bottom: 40px;
+  left: 30%;
+  filter: drop-shadow(0 0 20px rgba(74,155,127,0.5));
+  animation: float 3s ease-in-out infinite;
+}
+.hero-owl-scene .tree-trunk {
+  position: absolute;
+  bottom: 0;
+  right: 35%;
+  width: 16px;
+  height: 180px;
+  background: linear-gradient(180deg, #5C4033, #3B2615);
+  border-radius: 8px;
+}
+.hero-owl-scene .tree-canopy {
+  position: absolute;
+  top: 30px;
+  right: 25%;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 160px;
+  justify-content: center;
+}
+.hero-owl-scene .leaf {
+  font-size: 28px;
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+.hero-owl-scene .leaf:nth-child(2) { animation-delay: 0.4s; }
+.hero-owl-scene .leaf:nth-child(3) { animation-delay: 0.8s; }
+.hero-owl-scene .leaf:nth-child(4) { animation-delay: 1.2s; }
+.hero-owl-scene .leaf:nth-child(5) { animation-delay: 1.6s; }
+.hero-owl-scene .ground-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: radial-gradient(ellipse at center bottom, rgba(74,155,127,0.3), transparent 70%);
+}
+
+/* Unbox Scene */
+.unbox-scene {
+  width: 100%;
+  max-width: 500px;
+  height: 280px;
+  background: linear-gradient(180deg, #FFF8F0 0%, #FFF0E0 100%);
+  margin: 0 auto;
+  border: 1px solid rgba(74,155,127,0.15);
+}
+.unbox-scene .box-base {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 90px;
+  background: linear-gradient(135deg, #4A9B7F, #3D8B6F);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(74,155,127,0.3);
+}
+.unbox-scene .box-lid {
+  position: absolute;
+  bottom: 130px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  width: 150px;
+  height: 20px;
+  background: linear-gradient(135deg, #5AAF8F, #4A9B7F);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(74,155,127,0.2);
+}
+.unbox-scene .plush-owl {
+  font-size: 64px;
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: float 2.5s ease-in-out infinite;
+}
+.unbox-scene .sparkles {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+  font-size: 24px;
+}
+.unbox-scene .sparkles span { animation: twinkle 1.5s ease-in-out infinite alternate; }
+.unbox-scene .sparkles span:nth-child(2) { animation-delay: 0.5s; }
+.unbox-scene .sparkles span:nth-child(3) { animation-delay: 1s; }
+
+/* Story Tree Scene */
+.story-tree-scene {
+  width: 100%;
+  max-width: 600px;
+  height: 350px;
+  background: linear-gradient(180deg, #0d1f12 0%, #1a2a1a 50%, #0a1a0e 100%);
+  margin: 0 auto;
+}
+.story-tree-scene .trunk {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 200px;
+  background: linear-gradient(180deg, #5C4033, #3B2615);
+  border-radius: 10px;
+}
+.story-tree-scene .canopy-large {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story-tree-scene .mem-leaf {
+  position: absolute;
+  font-size: 32px;
+  transform: translate(var(--x, 0), var(--y, 0));
+  animation: twinkle 2.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 8px rgba(74,155,127,0.6));
+}
+.story-tree-scene .mem-leaf:nth-child(2) { animation-delay: 0.3s; }
+.story-tree-scene .mem-leaf:nth-child(3) { animation-delay: 0.7s; }
+.story-tree-scene .mem-leaf:nth-child(4) { animation-delay: 1.1s; }
+.story-tree-scene .mem-leaf:nth-child(5) { animation-delay: 1.5s; }
+.story-tree-scene .mem-leaf:nth-child(6) { animation-delay: 1.9s; }
+.story-tree-scene .mem-leaf:nth-child(7) { animation-delay: 2.3s; }
+.story-tree-scene .tiny-owl {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-30px);
+  font-size: 36px;
+  filter: drop-shadow(0 0 12px rgba(74,155,127,0.4));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(-50%); }
+  50% { transform: translateY(-8px) translateX(-50%); }
+}
+.hero-owl-scene .owl-body {
+  animation: float-no-x 3s ease-in-out infinite;
+}
+@keyframes float-no-x {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes twinkle {
+  0% { opacity: 0.6; transform: translate(var(--x, 0), var(--y, 0)) scale(0.9); }
+  100% { opacity: 1; transform: translate(var(--x, 0), var(--y, 0)) scale(1.1); }
+}
+
+@media (max-width: 600px) {
+  .hero-owl-scene { height: 220px; }
+  .hero-owl-scene .owl-body { font-size: 56px; }
+  .unbox-scene { height: 220px; }
+  .story-tree-scene { height: 260px; }
+}
 </style>
 <noscript><style>.fade-in { opacity: 1; transform: none; } .map-cell .meter i { width: var(--w, 50%); }</style></noscript>
 </head>
@@ -1158,7 +1345,18 @@ body {
   <div class="section-inner">
     <div class="hero-badge fade-in"><span class="pulse"></span>探月黑客松 · AI 创意大赛</div>
     <div class="hero-illustration fade-in fade-in-delay-1">
-      <img src="assets/hero-owl-tree.jpg" alt="灵偶猫头鹰玩偶坐在发光的故事树旁" width="1600" height="900">
+      <div class="css-illustration hero-owl-scene">
+        <div class="owl-body">🦉</div>
+        <div class="tree-trunk"></div>
+        <div class="tree-canopy">
+          <span class="leaf glow">🍃</span>
+          <span class="leaf glow">🌿</span>
+          <span class="leaf glow">✨</span>
+          <span class="leaf glow">🍃</span>
+          <span class="leaf glow">🌿</span>
+        </div>
+        <div class="ground-glow"></div>
+      </div>
     </div>
     <h1 class="hero-tagline fade-in fade-in-delay-2">种下第一棵树，<br>陪它一起长大</h1>
     <p class="hero-sub fade-in fade-in-delay-3">一只会说话的玩偶，一棵记录成长的故事树</p>
@@ -1176,7 +1374,14 @@ body {
 <section class="section unboxing" id="unboxing">
   <div class="section-inner">
     <div class="unbox-photo fade-in">
-      <img src="assets/owl-unbox.jpg" alt="毛绒猫头鹰玩偶和一张精致的小卡片" width="1200" height="900">
+      <div class="css-illustration unbox-scene">
+        <div class="box-base"></div>
+        <div class="box-lid"></div>
+        <div class="plush-owl">🧸</div>
+        <div class="sparkles">
+          <span>✨</span><span>✨</span><span>✨</span>
+        </div>
+      </div>
     </div>
     <p class="eyebrow fade-in"><span class="num">01</span>开箱 · UNBOX</p>
     <h2 class="section-title fade-in fade-in-delay-1">一份成长的礼物</h2>
@@ -1258,7 +1463,19 @@ body {
     <h2 class="section-title fade-in fade-in-delay-1">你们共同的记忆</h2>
     <p class="section-text fade-in fade-in-delay-2">叶子越来越多，树也越来越大。每一根枝干是一个话题，每一片叶子是一段故事。</p>
     <div class="tree-visual fade-in fade-in-delay-3">
-      <img class="tree-illustration" src="assets/story-tree.jpg" alt="挂满发光记忆叶子的大故事树，树下小玩偶仰望" width="1200" height="900">
+      <div class="css-illustration story-tree-scene">
+        <div class="trunk"></div>
+        <div class="canopy-large">
+          <span class="mem-leaf" style="--x:-40px;--y:-20px">🍃</span>
+          <span class="mem-leaf" style="--x:30px;--y:-50px">🌿</span>
+          <span class="mem-leaf" style="--x:-10px;--y:-70px">💛</span>
+          <span class="mem-leaf" style="--x:50px;--y:-30px">🍃</span>
+          <span class="mem-leaf" style="--x:-50px;--y:-60px">✨</span>
+          <span class="mem-leaf" style="--x:20px;--y:-80px">🌿</span>
+          <span class="mem-leaf" style="--x:-30px;--y:-90px">💚</span>
+        </div>
+        <div class="tiny-owl">🦉</div>
+      </div>
     </div>
     <p class="section-text fade-in fade-in-delay-3">这棵树，是你和灵偶一起写的。</p>
     <div class="tree-branches fade-in fade-in-delay-4">
