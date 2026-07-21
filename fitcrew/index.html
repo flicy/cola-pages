@@ -96,24 +96,24 @@
   .stage .m1{top:-14px;left:-8px;width:64px;animation:bob 6s ease-in-out infinite}
   .stage .m2{bottom:26px;right:-20px;width:74px;animation:bob 7s ease-in-out infinite 1s}
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(5deg)}}
-  .phone{position:relative;z-index:1;border-radius:42px;background:#12281D;padding:13px;box-shadow:var(--sh-lg);border:1px solid rgba(255,255,255,.08)}
-  .phone::before{content:"";position:absolute;top:13px;left:50%;transform:translateX(-50%);width:104px;height:25px;background:#0A1A12;border-radius:0 0 15px 15px;z-index:3}
-  .screen{border-radius:31px;overflow:hidden;background:linear-gradient(180deg,#163123,#0F241A);padding:46px 14px 18px}
-  .p-top{display:flex;align-items:center;gap:11px;padding:2px 6px 14px;border-bottom:1px solid rgba(255,255,255,.09)}
+  .phone{position:relative;z-index:1;border-radius:42px;background:#FFFFFF;padding:13px;box-shadow:var(--sh-lg);border:1.5px solid #EAF0E0}
+  .phone::before{content:"";position:absolute;top:13px;left:50%;transform:translateX(-50%);width:104px;height:25px;background:#EDF2E4;border-radius:0 0 15px 15px;z-index:3}
+  .screen{border-radius:31px;overflow:hidden;background:linear-gradient(180deg,#F9FCF5,#EFF5E8);padding:46px 14px 18px}
+  .p-top{display:flex;align-items:center;gap:11px;padding:2px 6px 14px;border-bottom:1.5px solid #E7EEDD}
   .p-top .logo{width:36px;height:36px;filter:none}
-  .p-top .g-name{font-weight:700;color:#fff;font-size:15px}
-  .p-top .g-sub{font-size:11.5px;color:rgba(255,255,255,.5)}
+  .p-top .g-name{font-weight:700;color:var(--ink);font-size:15px}
+  .p-top .g-sub{font-size:11.5px;color:var(--muted)}
   .chat{padding:16px 4px 4px;display:flex;flex-direction:column;gap:13px}
   .msg{max-width:85%;font-size:13.5px;line-height:1.6;padding:11px 14px;border-radius:17px}
   .msg .who{font-size:11px;font-weight:700;margin-bottom:4px}
-  .msg.bot{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);color:#E9F5EC;border-bottom-left-radius:6px;align-self:flex-start}
-  .msg.bot .who{color:#7BE3A8}
-  .msg.me{background:linear-gradient(135deg,#35C67E,#1FA793);color:#04231A;border-bottom-right-radius:6px;align-self:flex-end;font-weight:600;box-shadow:0 8px 20px -8px rgba(35,170,110,.5)}
-  .msg.other{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#DCEDE1;border-bottom-left-radius:6px;align-self:flex-start}
-  .msg.other .who{color:#FFB88C}
-  .msg .goal{display:inline-block;margin-top:7px;background:rgba(255,138,92,.18);color:#FFC4A0;border:1px solid rgba(255,138,92,.35);padding:2px 10px;border-radius:999px;font-size:11.5px;font-weight:700}
-  .typing{align-self:flex-start;display:flex;gap:4px;padding:13px 15px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);border-radius:17px;border-bottom-left-radius:6px}
-  .typing i{width:6px;height:6px;border-radius:50%;background:#7BE3A8;animation:blink 1.2s infinite}
+  .msg.bot{background:#FFFFFF;border:1.5px solid #E7EEDD;color:var(--ink-soft);border-bottom-left-radius:6px;align-self:flex-start;box-shadow:0 6px 16px -10px rgba(47,110,75,.22)}
+  .msg.bot .who{color:var(--green-deep)}
+  .msg.me{background:linear-gradient(135deg,#35C67E,#1FA793);color:#fff;border-bottom-right-radius:6px;align-self:flex-end;font-weight:600;box-shadow:0 8px 20px -8px rgba(35,170,110,.45)}
+  .msg.other{background:var(--mint);border:1.5px solid #DCEAD0;color:var(--ink-soft);border-bottom-left-radius:6px;align-self:flex-start}
+  .msg.other .who{color:#E8663C}
+  .msg .goal{display:inline-block;margin-top:7px;background:rgba(255,255,255,.28);color:#fff;border:1px solid rgba(255,255,255,.45);padding:2px 10px;border-radius:999px;font-size:11.5px;font-weight:700}
+  .typing{align-self:flex-start;display:flex;gap:4px;padding:13px 15px;background:#fff;border:1.5px solid #E7EEDD;border-radius:17px;border-bottom-left-radius:6px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
   .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
   @keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
   @media(max-width:940px){.hero-grid{grid-template-columns:1fr;gap:56px}.stage{margin:0 auto}}
