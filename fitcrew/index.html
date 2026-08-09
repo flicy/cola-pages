@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <script>document.documentElement.classList.add('js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>FitCrew · AI 健身管理专家 — 不是 AI 客服，是你自己的 Body OS</title>
-<meta name="description" content="FitCrew（Fit健康+Crew伙伴）是运行在飞书上的开源 AI 健身管理专家。不是 AI 客服，是你自己的 Body OS：有你的记忆、你的偏好、专家知识库、你自己的健康数据库。提交需求或投稿知识，一起共创。">
+<title>FitCrew · AI 健身管理专家 — BodyOS 私人生活方式教练</title>
+<meta name="description" content="FitCrew 是 AI 健身管理专家，BodyOS 是你在飞书中接触到的私人生活方式教练。V2 汇集 Apple Watch 与鱼跃血糖数据，理解食物、血糖与身体感知，并在群聊中回答通用健康知识。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#F7F8F0;
@@ -29,7 +29,7 @@
     --sans:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Source Han Sans SC","Microsoft YaHei",ui-sans-serif,system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;overflow-x:hidden}
   body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   ::selection{background:rgba(47,182,115,.25)}
   .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
@@ -157,6 +157,25 @@
   .l1-panel .p-desc{font-size:14px;color:var(--ink-soft);margin-bottom:14px}
   .b-l1 .l1-panel .demo{margin-top:0}
   @media(max-width:880px){.b-l1,.b-l2,.b-l3{grid-column:span 12;grid-row:auto}}
+
+  /* ---------- V2 已上线 ---------- */
+  .v2-shell{position:relative;overflow:hidden;border-radius:38px;padding:clamp(36px,6vw,68px);background:linear-gradient(145deg,#E7F3DE,#F9F7E8);border:1.5px solid #D6E7C8;box-shadow:var(--sh-lg)}
+  .v2-shell::before{content:"V2";position:absolute;right:-12px;top:-72px;font-size:clamp(150px,22vw,280px);line-height:1;font-weight:800;letter-spacing:-.08em;color:rgba(47,182,115,.07);pointer-events:none}
+  .v2-intro{position:relative;display:grid;grid-template-columns:.72fr 1.28fr;gap:clamp(28px,5vw,72px);align-items:end;margin-bottom:clamp(30px,5vw,52px)}
+  .v2-intro .sec-tag{margin-bottom:0;justify-self:start}
+  .v2-intro h2{max-width:17em}
+  .v2-intro p{color:var(--ink-soft);font-size:16px;max-width:34em}
+  .v2-grid{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .v2-card{background:rgba(255,255,255,.88);border:1.5px solid rgba(205,226,190,.9);border-radius:26px;padding:clamp(22px,3vw,30px);box-shadow:0 18px 42px -30px rgba(40,95,66,.38);transition:transform .24s cubic-bezier(.2,.7,.2,1),box-shadow .24s}
+  .v2-card:hover{transform:translateY(-5px);box-shadow:0 26px 56px -32px rgba(40,95,66,.46)}
+  .v2-card:nth-child(2){background:rgba(255,247,235,.9);border-color:#F2DFC9}
+  .v2-card:nth-child(3){background:rgba(235,247,240,.92);border-color:#D5EADF}
+  .v2-card:nth-child(4){background:rgba(245,242,229,.92);border-color:#E6DFC7}
+  .v2-icon{font-size:30px;margin-bottom:14px}
+  .v2-card h3{font-size:20px;line-height:1.35;margin-bottom:9px;letter-spacing:-.015em}
+  .v2-card p{font-size:14.5px;color:var(--ink-soft)}
+  .v2-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  @media(max-width:760px){.v2-intro{grid-template-columns:1fr;align-items:start}.v2-grid{grid-template-columns:1fr}.v2-shell{border-radius:30px}.v2-card{padding:22px}}
 
   /* ---------- 工作原理 stepper ---------- */
   .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:step}
@@ -368,7 +387,7 @@
   <div class="nav-bar">
     <div class="brand"><svg class="logo"><use href="#fc-logo"/></svg> FitCrew</div>
     <div class="nav-links">
-      <a href="#why">为什么</a><a href="#layers">能力</a><a href="#cases">真实案例</a><a href="#roadmap">路线图</a><a href="#feedback">提需求</a><a href="#oss">开源</a>
+      <a href="#why">为什么</a><a href="#layers">能力</a><a href="#v2-update">V2 更新</a><a href="#cases">互动场景</a><a href="#roadmap">路线图</a><a href="#feedback">提需求</a><a href="#oss">开源</a>
     </div>
     <div class="nav-act">
       <a class="btn btn-soft sm" href="https://my.feishu.cn/share/base/shrcn09DqqE2jjV5mWi7ZPrrG8f" target="_blank" rel="noopener">📝 提交需求</a>
@@ -381,9 +400,9 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div class="reveal">
-      <span class="eyebrow"><span class="dot"></span> FitCrew · 运行在飞书上的 AI 健身管理专家 · 已开源</span>
+      <span class="eyebrow"><span class="dot"></span> FitCrew · AI 健身管理专家 · V2 已上线</span>
       <h1>不是 AI 客服，<br>是<span class="hl">你自己的 Body OS</span></h1>
-      <p class="lead">很多人看到 FitCrew 会问：“这不就是 AI 客服吗？”不是。客服答完标准问题就忘了你；FitCrew 是你自己的身体操作系统——它记得你、懂你的偏好、装着专家知识、还有你自己的健康数据库。<b>Fit＝健康，Crew＝伙伴</b>，是陪你把健康坚持下去的搭子团队。</p>
+      <p class="lead"><b>BodyOS 是你在飞书中接触到的私人生活方式教练。</b>它把持续汇集的身体数据、你的主观感受和科学知识放进同一段长期对话，陪你把复杂信息变成今天能做的小行动。</p>
       <div class="cta-row">
         <a class="btn btn-fill" href="https://my.feishu.cn/share/base/shrcn09DqqE2jjV5mWi7ZPrrG8f" target="_blank" rel="noopener">📝 提交需求，一起共创 →</a>
         <button class="btn btn-soft" data-open-fs>扫码加我飞书</button>
@@ -407,10 +426,10 @@
             <div><div class="g-name">健康搭子打卡群</div><div class="g-sub">FitCrew · AI 健身管理专家</div></div>
           </div>
           <div class="chat">
-            <div class="msg me">今晚吃的喜家德 12 个饺子 🥟</div>
-            <div class="msg bot"><div class="who">FitCrew</div>12 个刚刚好～ 约 <b>500-600 大卡</b>，蛋白质 20-25g、碳水 50-60g。✅ 合格的一餐，营养均衡，量也适中</div>
-            <div class="msg me">我今天走了 8500 步</div>
-            <div class="msg bot"><div class="who">FitCrew</div>8500 步，非常棒！👏 已经进入主动活跃区间，饺子的消耗也刚刚好，能量平衡拿捏住了～ 每天稳定 8000+ 步，对心血管、血糖、睡眠都有明显帮助 💪</div>
+            <div class="msg me">晚饭后散步为什么有助于控糖？</div>
+            <div class="msg bot"><div class="who">BodyOS</div>餐后做轻度活动时，肌肉会增加对葡萄糖的利用。可以从 <b>10 分钟舒适步行</b>开始；这是通用生活方式知识，不读取群成员的个人健康数据。</div>
+            <div class="msg me">今天完成了一个健康小行动 ✅</div>
+            <div class="msg bot"><div class="who">BodyOS</div>收到。完成比完美更重要，明天继续一个同样小的行动就好 🌱</div>
             <div class="typing"><i></i><i></i><i></i></div>
           </div>
         </div>
@@ -441,7 +460,7 @@
       <div class="pillar reveal">
         <div class="p-ico">📚</div>
         <h3>专家系统</h3>
-        <p>内置运动 / 营养 / 睡眠 / 恢复知识框架，加上持续加入的书籍笔记——像《抗糖革命》、精力管理。健康不止运动，还包括怎么好好吃。</p>
+        <p>内置运动 / 营养 / 睡眠 / 恢复知识框架，并收录《控糖革命》《百岁人生行动手册》《睡眠优化完全指南：科学与实践》。</p>
       </div>
       <div class="pillar reveal">
         <div class="p-ico">🗄️</div>
@@ -486,8 +505,8 @@
             <div class="demo">「本周 12 位伙伴完成 5 天打卡 🎉」——群体的坚持，<b>一目了然</b>。</div>
           </div>
           <div class="l1-panel">
-            <p class="p-desc">群里 @ FitCrew 问任何健康问题，它结合上下文即时专业应答，不是套话。</p>
-            <div class="demo">「@FitCrew 膝盖不舒服能做深蹲吗？」——它会结合你的情况给出<b>专业建议</b>。</div>
+            <p class="p-desc">群里 @ BodyOS，可以询问通用饮食、训练、睡眠与控糖知识，也可以一起打卡；个人健康数据只在本人授权后的 BodyOS 私聊中使用。</p>
+            <div class="demo">「@BodyOS 晚饭后散步为什么有助于控糖？」——它会提供<b>通用科学知识与可执行建议</b>，不会读取群成员的个人健康数据。</div>
           </div>
         </div>
       </div>
@@ -495,15 +514,55 @@
         <span class="badge">L2 · 个人私管理</span>
         <div class="ico"><svg width="28" height="28" viewBox="0 0 240 240"><use href="#fc-logo"/></svg></div>
         <h3>单聊里的私密健康顾问</h3>
-        <p>只属于你的个性化跟踪与建议，敏感数据绝不进任何群。</p>
-        <div class="chips"><span class="chip">入组评估</span><span class="chip">目标拆成微目标</span><span class="chip">每周私聊小结</span></div>
+        <p>在本人授权的边界内，把食物、血糖、睡眠、训练和身体感知放在一起讨论，敏感数据绝不进任何群。</p>
+        <div class="chips"><span class="chip">食物 × 血糖</span><span class="chip">身体感知</span><span class="chip">目标拆成微行动</span></div>
       </div>
       <div class="tile b-l3 reveal">
         <span class="badge">L3 · 专家大脑</span>
         <div class="ico"><svg width="30" height="30" viewBox="0 0 64 64"><use href="#leafs" fill="#31584A"/></svg></div>
         <h3>科学方法，下沉到每次触达</h3>
-        <p>运动 / 营养 / 恢复 / 睡眠知识框架 + 行为科学方法论。</p>
-        <div class="chips"><span class="chip">微习惯</span><span class="chip">看行为不比体重</span><span class="chip">不惩罚</span></div>
+        <p>三本科学书籍 + 运动 / 营养 / 恢复 / 睡眠知识框架 + 行为科学方法论。</p>
+        <div class="chips"><span class="chip">控糖</span><span class="chip">长期行动</span><span class="chip">睡眠优化</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- V2 已上线 -->
+<section id="v2-update">
+  <div class="wrap">
+    <div class="v2-shell">
+      <div class="v2-intro reveal">
+        <span class="sec-tag">V2 · 已上线</span>
+        <div>
+          <h2>身体数据、主观感受和科学知识，终于能在同一段对话里工作</h2>
+          <p>FitCrew V2 让 BodyOS 成为你在飞书中持续对话的私人生活方式教练。</p>
+        </div>
+      </div>
+      <div class="v2-grid">
+        <article class="v2-card reveal">
+          <div class="v2-icon">⌚️</div>
+          <h3>Apple Watch + 鱼跃血糖数据</h3>
+          <p>经你授权，由 iPhone HealthKit Bridge 读取已进入 Apple Health 的 Apple Watch 与鱼跃 Anytime 5 Pro 数据。</p>
+        </article>
+        <article class="v2-card reveal">
+          <div class="v2-icon">🥗</div>
+          <h3>食物 × 血糖 × 身体感知</h3>
+          <p>在 BodyOS 私聊中，把今天吃了什么、血糖如何变化和自己的感受放在一起讨论。</p>
+        </article>
+        <article class="v2-card reveal">
+          <div class="v2-icon">💬</div>
+          <h3>群聊里的通用健康问答</h3>
+          <p>回答通用饮食、训练、睡眠与控糖知识，也参与打卡互动；不会在群里读取或展示个人健康数据。</p>
+        </article>
+        <article class="v2-card reveal">
+          <div class="v2-icon">📚</div>
+          <h3>三本科学书籍持续指导</h3>
+          <p>知识库收录《控糖革命》《百岁人生行动手册》《睡眠优化完全指南：科学与实践》。</p>
+        </article>
+      </div>
+      <div class="v2-actions reveal">
+        <a class="btn btn-fill" href="https://github.com/flicy/fitcrew-agent/releases/tag/v2.0.0" target="_blank" rel="noopener">查看 V2 版本说明</a>
       </div>
     </div>
   </div>
@@ -550,7 +609,7 @@
         <div>
           <span class="sec-tag">知识共建</span>
           <h2>FitCrew 的知识库，一起建</h2>
-          <p>健康管理不止运动和睡眠，还包括怎么好好吃、怎么恢复、怎么睡。FitCrew 的专家系统除了内置知识，更会随大家的贡献一起成长：你认同的健身指导、读过的书籍笔记（像《抗糖革命》、精力管理）、营养知识总结，都欢迎投给我们。</p>
+          <p>健康管理不止运动和睡眠，还包括怎么好好吃、怎么恢复、怎么长期行动。当前知识库收录《控糖革命》《百岁人生行动手册》《睡眠优化完全指南：科学与实践》，也会随可信的新资料持续成长。</p>
           <div class="chips" style="margin-top:22px">
             <span class="chip">📖 书籍笔记</span>
             <span class="chip">🏋️ 健身指导</span>
@@ -583,14 +642,14 @@
         <p>多群打卡、每日陪伴、晚间复盘、每周周报、同伴互励。让健康变成一件有人陪你一起做的事。</p>
       </div>
       <div class="rm-arrow reveal">→</div>
-      <div class="rm-card next reveal">
-        <div class="rm-tag">v2 · 开发中</div>
-        <h3>「零输入」</h3>
-        <div class="rm-solve">解决“不用动手也能管健康”</div>
-        <p>自动数据接入（苹果健康 / 智能手表 / 动态血糖仪），精力管理（血糖 × 睡眠 × HRV × 运动）。不用手动记录，它自动读懂你。</p>
+      <div class="rm-card done reveal">
+        <div class="rm-tag">v2 · 已上线</div>
+        <h3>「读懂身体」</h3>
+        <div class="rm-solve">解决“数据很多，却不知道它们说明什么”</div>
+        <p>汇集 Apple Watch 与鱼跃血糖数据，在私聊中理解食物、血糖和身体感知，在群聊中回答通用健康问题，并用三本科学书籍持续指导。</p>
       </div>
     </div>
-    <p class="rm-more reveal">v3 及以后：随大家共建生长的知识库、更多数据接入、更聪明的精力管理——<b>一起期待</b> ✨</p>
+    <p class="rm-more reveal">v3 及以后：更多可选设备、更完整的长期趋势与更自然的主动陪伴——<b>一起期待</b> ✨</p>
   </div>
 </section>
 
@@ -625,13 +684,13 @@
       <span class="sec-tag">隐私与专业边界</span>
       <h2>你的私密数据，<br>绝不会出现在群里</h2>
       <div class="trust-list">
-        <div class="trust-item"><div class="ti"><svg width="24" height="24" viewBox="0 0 64 64"><use href="#leafs" fill="#2FB673"/></svg></div><div><h4>群与群严格隔离</h4><p>A 群的消息、数据、成员，绝不出现在 B 群。</p></div></div>
-        <div class="trust-item"><div class="ti"><svg width="24" height="24" viewBox="0 0 64 64"><use href="#leafs" fill="#1FA793"/></svg></div><div><h4>群与个人严格隔离</h4><p>体重、围度、伤病、睡眠等敏感信息只走单聊，绝不进群。</p></div></div>
+        <div class="trust-item"><div class="ti"><svg width="24" height="24" viewBox="0 0 64 64"><use href="#leafs" fill="#2FB673"/></svg></div><div><h4>群聊只答通用知识</h4><p>回答通用饮食、训练、睡眠与控糖知识，也参与打卡；不读取任何人的个人健康数据。</p></div></div>
+        <div class="trust-item"><div class="ti"><svg width="24" height="24" viewBox="0 0 64 64"><use href="#leafs" fill="#1FA793"/></svg></div><div><h4>个人分析只在本人私聊</h4><p>食物、血糖、睡眠、训练和身体感知，只在对应用户主动授权后的 BodyOS 私聊中使用。</p></div></div>
         <div class="trust-item"><div class="ti"><svg width="24" height="24" viewBox="0 0 64 64"><use href="#leafs" fill="#FF8A5C"/></svg></div><div><h4>给建议，不做诊断</h4><p>提供生活方式建议；涉及疾病、用药、进食障碍，引导就医。</p></div></div>
       </div>
     </div>
     <div class="trust-card reveal">
-      <div class="q">群里只谈<b>行为与感受</b>，<br>数据只属于<b>你自己</b>。</div>
+      <div class="q">群里谈<b>通用知识与行动</b>，<br>私聊才谈<b>你的数据和感受</b>。</div>
       <div class="rule">
         <span>每条群消息发送前，自动自检是否触及隐私红线</span>
         <span>私人档案仅从你本人的单聊写入，不从他人描述推断</span>
@@ -641,38 +700,38 @@
   </div>
 </section>
 
-<!-- 真实案例 -->
+<!-- 群聊互动场景 -->
 <section id="cases">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="sec-tag">真实案例</span>
-      <h2>群里正在发生的真实瞬间</h2>
-      <p>不是演示脚本，是 FitCrew 每天在群里真实做的事——以下都来自真实群聊摘录。</p>
+      <span class="sec-tag">群聊互动</span>
+      <h2>通用健康问题，可以直接在群里问</h2>
+      <p>BodyOS 回答通用知识并陪伴行动；一旦问题需要个人数据或医疗判断，就会把边界说清楚。</p>
     </div>
     <div class="scenes">
       <div class="scene reveal">
-        <div class="e">🥟</div>
-        <h4>食物热量秒算</h4>
-        <p class="q">「今晚吃的喜家德 12 个饺子」</p>
-        <p>→ 秒算 500-600 大卡，蛋白质 / 碳水 / 脂肪逐项分析，判定“合格的一餐”。</p>
+        <div class="e">🚶</div>
+        <h4>餐后活动</h4>
+        <p class="q">「晚饭后散步为什么有助于控糖？」</p>
+        <p>→ 解释肌肉利用葡萄糖的通用机制，并给出从舒适步行开始的低门槛建议。</p>
       </div>
       <div class="scene reveal">
-        <div class="e">🩹</div>
-        <h4>伤员康复陪伴</h4>
-        <p class="q">「今天可以练臀腿了，在慢慢康复」</p>
-        <p>→ 从自重开始、关注两侧对称、练后冰敷，提醒“别急着上重量”。</p>
+        <div class="e">🏋️</div>
+        <h4>训练知识</h4>
+        <p class="q">「力量训练为什么需要安排恢复日？」</p>
+        <p>→ 解释刺激、恢复和适应的关系；涉及疼痛或伤病时，明确建议私聊或寻求专业评估。</p>
       </div>
       <div class="scene reveal">
-        <div class="e">✈️</div>
-        <h4>出差健康清单</h4>
-        <p class="q">「又要去上海出差了，有什么注意事项？」</p>
-        <p>→ 口罩、清淡饮食、常备药，还有一句“出差期间不强制打卡”。</p>
+        <div class="e">🌙</div>
+        <h4>睡眠习惯</h4>
+        <p class="q">「为什么每天固定起床时间很重要？」</p>
+        <p>→ 说明稳定节律对睡意与清醒节奏的影响，给出渐进调整的通用方法。</p>
       </div>
       <div class="scene reveal">
-        <div class="e">💧</div>
-        <h4>喝水目标管理</h4>
-        <p class="q">「太忙了，忙到只有下午才喝水」</p>
-        <p>→ 设每小时提醒，9:00-20:00 累计追踪 1.8L 目标，到点喊你。</p>
+        <div class="e">🥗</div>
+        <h4>饮食与控糖</h4>
+        <p class="q">「进食顺序为什么可能影响餐后血糖？」</p>
+        <p>→ 结合科学书籍说明常见机制与实践方式，不替任何群成员解读个人血糖。</p>
       </div>
     </div>
   </div>
