@@ -367,8 +367,8 @@
       <div class="hello">
         <div class="date" id="dateLine">2026年8月15日 · 周六</div>
         <div class="pill soft" style="display:inline-flex;margin-top:8px">虚构示例数据 · 非医疗建议</div>
-        <h1>早上好，林夏</h1>
-        <div class="sub">昨晚睡得不错，今天适合按平常节奏来。</div>
+        <h1>早上好，Chris CCC</h1>
+        <div class="sub">昨晚的睡眠把 HRV 收益保住了，今天状态在线。</div>
       </div>
 
       <div class="card">
@@ -379,20 +379,20 @@
           </div>
           <div class="state-copy">
             <h2 id="stateName">Flow</h2>
-            <p id="stateWhy">睡眠和静息心率都在你最近的常见范围内。</p>
+            <p id="stateWhy">训练日的恢复没被熬夜抵消，心率变异性回到近两周高位。</p>
           </div>
         </div>
         <div class="state-tags">
-          <span class="pill">睡眠 7.4h</span>
-          <span class="pill">HRV 48ms</span>
-          <span class="pill soft">静息心率 64 · 常见范围</span>
+          <span class="pill">睡眠 7.6h</span>
+          <span class="pill">HRV 74ms</span>
+          <span class="pill warn">静息心率 62 · 偏高</span>
         </div>
       </div>
 
       <div class="action" id="missionCard">
         <div class="kicker">Today Mission · 今天就赢这一件</div>
-        <h3 id="missionTitle">午饭后散步 15 分钟</h3>
-        <div class="why" id="missionWhy">今天没有异常提醒。完成一个轻量行动，看看下午的精力是否更稳定。</div>
+        <h3 id="missionTitle">今晚 21:30 前睡够 7.5 小时</h3>
+        <div class="why" id="missionWhy">过去 14 天，睡眠不足 7 小时的日子，次日空腹血糖峰值平均高 12%。你离周目标还差 2 天好睡眠。</div>
         <div class="row">
           <button class="btn primary" onclick="completeMission()">✓ 完成这件</button>
           <button class="btn ghost" onclick="skipMission()">跳过</button>
@@ -416,7 +416,7 @@
         <div class="kicker">Next Check</div>
         <div class="listrow" style="padding-top:6px">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/></svg></div>
-          <div class="tt"><div class="a">今晚 21:30</div><div class="b">Body Check · 记录今天的精力</div></div>
+          <div class="tt"><div class="a">明日 08:00</div><div class="b">体重 + 空腹血糖</div></div>
           <div class="meta"><div class="v" style="font-size:13px;color:var(--fit-green)">已安排</div></div>
         </div>
       </div>
@@ -429,7 +429,7 @@
       </div>
       <div class="hello" style="margin-top:2px">
         <h1 style="font-size:24px">90 天身体旅程</h1>
-        <div class="sub">方向：保持精力，建立稳定作息。</div>
+        <div class="sub">方向：减脂同时保住训练收益。</div>
       </div>
 
       <div class="seg">
@@ -440,33 +440,33 @@
 
       <div class="card">
         <div class="kicker">体脂率</div>
-        <div class="big-num">27.1% <span class="delta up">−0.5%</span></div>
+        <div class="big-num">24.8% <span class="delta down">−1.6%</span></div>
         <div class="chart-wrap">
           <div class="chart-legend">
             <span><i style="background:var(--fit-green)"></i>体脂率</span>
-            <span><i style="background:var(--fit-coral)"></i>个人目标 26%</span>
+            <span><i style="background:var(--fit-coral)"></i>目标 20%</span>
           </div>
           <svg id="bodyfatChart" viewBox="0 0 360 120" preserveAspectRatio="none" style="width:100%;height:120px"></svg>
         </div>
       </div>
 
       <div class="grid">
-        <div class="stat"><div class="l">骨骼肌</div><div class="v">22.1 kg</div><div class="d up">保持稳定</div></div>
-        <div class="stat"><div class="l">VO₂ Max</div><div class="v">36.0</div><div class="d up">近期稳定</div></div>
-        <div class="stat"><div class="l">静息心率</div><div class="v">64</div><div class="d up">常见范围</div></div>
-        <div class="stat"><div class="l">平均睡眠</div><div class="v">7.3h</div><div class="d up">+0.3h</div></div>
+        <div class="stat"><div class="l">骨骼肌</div><div class="v">21.9 kg</div><div class="d up">+0.4 kg</div></div>
+        <div class="stat"><div class="l">VO₂ Max</div><div class="v">35.2</div><div class="d up">+3.2</div></div>
+        <div class="stat"><div class="l">静息心率</div><div class="v">62</div><div class="d down">+4 · 需恢复</div></div>
+        <div class="stat"><div class="l">平均睡眠</div><div class="v">7.2h</div><div class="d up">+0.6h</div></div>
       </div>
 
       <div class="card">
         <div class="kicker">里程碑</div>
         <div class="listrow">
           <div class="ic" style="background:#FDF1E0;color:#B9612F"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="tt"><div class="a">四周回顾</div><div class="b">作息更规律，体成分保持稳定</div></div>
+          <div class="tt"><div class="a">InBody 复查</div><div class="b">体脂回到 25% 以下，肌肉稳住了</div></div>
           <div class="meta"><div class="l">8月2日</div></div>
         </div>
         <div class="listrow">
           <div class="ic" style="background:#E8F1E4"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-          <div class="tt"><div class="a">晨间状态观察</div><div class="b">睡得更完整时，主观精力通常更好</div></div>
+          <div class="tt"><div class="a">训练日 HRV 收益被确认</div><div class="b">睡够的日子，恢复质量明显更好</div></div>
           <div class="meta"><div class="l">7月28日</div></div>
         </div>
       </div>
@@ -489,20 +489,20 @@
         <div class="bar" style="margin:14px 0 4px"><i style="width:57%"></i></div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--fit-muted)"><span>第 4 天</span><span>还剩 3 天</span></div>
         <div class="kvs" style="display:grid;gap:6px;margin-top:14px">
-          <div class="kv"><b>假设</b><span>睡得更完整，次日主观精力可能更好</span></div>
-          <div class="kv"><b>观察指标</b><span>睡眠时长 · 主观精力</span></div>
-          <div class="kv"><b>成功标准</b><span>7 天里完成 5 次睡前记录</span></div>
-          <div class="kv"><b>调整条件</b><span>觉得疲惫时随时暂停</span></div>
+          <div class="kv"><b>假设</b><span>睡够可提升次日 HRV</span></div>
+          <div class="kv"><b>观察指标</b><span>HRV · 静息心率 · 主观精力</span></div>
+          <div class="kv"><b>成功标准</b><span>7 天里 ≥5 天 HRV 上升</span></div>
+          <div class="kv"><b>停止条件</b><span>连续 2 晚失眠</span></div>
         </div>
       </div>
 
       <div class="prop" id="proposal">
         <div class="tag">AI 新提议 · 待你决定</div>
-        <h4>午饭后轻走 10 分钟</h4>
-        <p>最近几次午饭后有点犯困。可以试试轻走 10 分钟，看看下午的主观精力有没有变化。</p>
+        <h4>晚餐碳水后移</h4>
+        <p>你的晚餐后 60–90 分钟血糖峰值偏高。试试把晚餐主食减 1/3、提前到 19:00 前，观察峰值是否回落。</p>
         <div class="kvs">
           <div class="kv"><b>周期</b><span>7 天 · 低风险</span></div>
-          <div class="kv"><b>观察</b><span>主观精力 · 午后步数</span></div>
+          <div class="kv"><b>观察</b><span>餐后峰值 · 次日空腹血糖</span></div>
         </div>
         <div class="row" style="display:flex;gap:10px;margin-top:14px">
           <button class="btn primary" style="background:var(--fit-green-deep);color:#fff" onclick="acceptExp()">接受实验</button>
@@ -514,7 +514,7 @@
         <div class="kicker">已完成</div>
         <div class="listrow">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 12l2.6 2.6L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="tt"><div class="a">早餐类型 × 上午精力</div><div class="b">完成一次个人观察，结果仅供自己参考</div></div>
+          <div class="tt"><div class="a">早餐类型 × 上午精力</div><div class="b">高蛋白早餐上午更稳，已记入记忆</div></div>
           <div class="meta"><div class="v" style="color:var(--fit-green)">有用</div></div>
         </div>
       </div>
@@ -551,15 +551,15 @@
       </div>
 
       <div class="grid">
-        <div class="stat" onclick="toast('已记录今晨体重 58.2kg')" style="cursor:pointer"><div class="l">体重</div><div class="v">58.2 <small style="font-size:12px;color:var(--fit-muted)">kg</small></div><div class="d up">近期稳定</div></div>
+        <div class="stat" onclick="toast('已记录今晨体重 56.8kg')" style="cursor:pointer"><div class="l">体重</div><div class="v">56.8 <small style="font-size:12px;color:var(--fit-muted)">kg</small></div><div class="d down">−0.3 kg</div></div>
         <div class="stat" onclick="toast('训练感受：上肢偏累，下肢良好')" style="cursor:pointer"><div class="l">训练感受</div><div class="v" style="font-size:16px;font-weight:700">上肢偏累</div><div class="d" style="color:var(--fit-muted)">昨天 · 力量</div></div>
       </div>
 
       <div class="card">
         <div class="kicker">今日时间线</div>
         <div class="listrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="tt"><div class="a">07:40 · 早餐</div><div class="b">鸡蛋 + 燕麦 + 黑咖啡</div></div></div>
-        <div class="listrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 15l4-4 4 4 4-6 4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="tt"><div class="a">12:45 · 午后散步</div><div class="b">12 分钟 · 轻松完成</div></div><div class="meta"><div class="v">12 min</div></div></div>
-        <div class="listrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="tt"><div class="a">昨晚 · 睡眠</div><div class="b">7.4h · 夜间较少醒来</div></div><div class="meta"><div class="v">7.4h</div></div></div>
+        <div class="listrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 15l4-4 4 4 4-6 4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="tt"><div class="a">08:05 · 空腹血糖</div><div class="b">5.4 mmol/L · 平稳</div></div><div class="meta"><div class="v">5.4</div></div></div>
+        <div class="listrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="tt"><div class="a">昨晚 · 睡眠</div><div class="b">7.6h · 深睡 1.9h</div></div><div class="meta"><div class="v">7.6h</div></div></div>
       </div>
     </section>
 
@@ -575,15 +575,15 @@
 
       <div class="card">
         <div class="kicker">90 天目标</div>
-        <h3>保持稳定作息与每周 3 次活动</h3>
-        <div class="bar" style="margin-top:12px"><i style="width:46%"></i></div>
-        <div class="muted" style="margin-top:6px;display:flex;justify-content:space-between"><span>本周已完成 2 次</span><span>按自己的节奏来</span></div>
+        <h3>体脂 26.4% → 20%</h3>
+        <div class="bar" style="margin-top:12px"><i style="width:32%"></i></div>
+        <div class="muted" style="margin-top:6px;display:flex;justify-content:space-between"><span>当前 24.8%</span><span>完成 32%</span></div>
       </div>
 
       <div class="card">
         <div class="kicker">数据来源</div>
         <div class="rowline"><div class="lt"><div class="a">Apple 健康</div><div class="b">活动 · 睡眠 · 训练</div></div><div class="switch on"></div></div>
-        <div class="rowline"><div class="lt"><div class="a">CGM 历史数据</div><div class="b">16 天记录 · 已归档</div></div><div class="switch"></div></div>
+        <div class="rowline"><div class="lt"><div class="a">鱼跃血糖</div><div class="b">经 Apple 健康同步</div></div><div class="switch on"></div></div>
         <div class="rowline"><div class="lt"><div class="a">InBody</div><div class="b">体成分 · 待接入</div></div><div class="switch"></div></div>
       </div>
 
@@ -596,7 +596,7 @@
 
       <div class="card">
         <div class="kicker">它记住的</div>
-        <div class="muted" style="line-height:1.7">「有几次高蛋白早餐后，上午主观精力更稳」「睡得更完整时，晨间状态自评更好」「晚饭后散步通常让身体更舒服」</div>
+        <div class="muted" style="line-height:1.7">「高蛋白早餐，上午精力更稳」「熬夜会抵消训练日 HRV 收益」「晚餐主食越晚，餐后峰值越高」</div>
       </div>
     </section>
 
@@ -652,11 +652,11 @@
   function drawBodyfat(range) {
     const w = 360, h = 120, pad = 8;
     const data = {
-      30: [27.6,27.5,27.4,27.3,27.2,27.1],
-      60: [27.9,27.8,27.7,27.6,27.5,27.4,27.3,27.1],
-      90: [28.2,28.1,28.0,27.9,27.8,27.6,27.5,27.4,27.2,27.1]
+      30: [25.4,25.3,25.2,25.0,24.9,24.8],
+      60: [25.9,25.8,25.6,25.5,25.3,25.1,25.0,24.8],
+      90: [26.4,26.3,26.2,26.0,25.8,25.6,25.4,25.2,25.0,24.8]
     }[range];
-    const min = 25.5, max = 28.4;
+    const min = 24.5, max = 26.6;
     const pts = data.map((v,i) => {
       const x = pad + (i/(data.length-1))*(w-pad*2);
       const y = pad + (1-(v-min)/(max-min))*(h-pad*2);
@@ -671,7 +671,7 @@
       d += ` Q ${p[0]} ${p[1]} ${mx} ${(p[1]+c[1])/2}`;
     }
     d += ` L ${pts[pts.length-1][0]} ${pts[pts.length-1][1]}`;
-    const targetY = pad + (1-(26-min)/(max-min))*(h-pad*2);
+    const targetY = pad + (1-(20-min)/(max-min))*(h-pad*2);
     const area = d + ` L ${pts[pts.length-1][0]} ${h-pad} L ${pts[0][0]} ${h-pad} Z`;
     $('#bodyfatChart').innerHTML =
       `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2FB673" stop-opacity="0.28"/><stop offset="1" stop-color="#2FB673" stop-opacity="0"/></linearGradient></defs>
@@ -712,8 +712,8 @@
     $('#proposal').style.boxShadow = 'var(--shadow-sm)';
     $('#proposal').innerHTML =
       `<div class="kicker" style="color:var(--fit-green)">已接受 · 明日开始</div>
-       <h4>午饭后轻走 10 分钟</h4>
-       <p>明天午饭后轻松走一会儿，晚上记录一下下午的精力感受。</p>`;
+       <h4>晚餐碳水后移</h4>
+       <p>明晚 19:00 前吃完，主食减 1/3。明早开始记录餐后峰值。</p>`;
     toast('实验已加入计划');
   }
   function rejectExp() {
