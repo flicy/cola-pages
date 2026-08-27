@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitClew v4 · Task Management Template Study</title>
+<!--
+  FitClew Demo v4 — 像素级学习 Figma 社区模板 Task Management & To-Do List App (Neser U., CC BY 4.0)
+  视觉事实源：DESIGN.md §2b（内部） §2b
+  Step 0 应用调研结论：模板单强调色策略（唯一主紫）、冷调薰衣草灰白基底、白卡+柔和阴影替代描边、
+  周历条/筛选胶囊/任务行/统计大卡/FAB 六大布局签名；iOS 形态硬约束保持。
+-->
+<style>
+:root{
+  --bg-page:#F5F5FA; --bg-card:#FFFFFF; --bg-inset:#F1F0F7;
+  --ink-1:#1E1B2E; --ink-2:#8E89A3; --ink-3:#B9B5C9;
+  --accent:#7C3AED; --accent-deep:#5B21B6; --accent-tint:#EFE9FC;
+  --line:#ECEAF3;
+  --ok:#3BA776; --warn:#D9930D;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#E9E8F0;font-family:-apple-system,"PingFang SC",sans-serif;color:var(--ink-1);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:32px 16px}
+button{font-family:inherit;border:none;background:none;cursor:pointer}
+
+/* ── iPhone 机身 ── */
+.phone{width:393px;height:852px;background:var(--bg-page);border-radius:54px;overflow:hidden;position:relative;box-shadow:0 24px 80px rgba(30,27,46,.28),0 0 0 12px #141218;display:flex;flex-direction:column}
+.statusbar{height:54px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;font-size:15px;font-weight:700}
+.statusbar .right{display:flex;gap:5px;align-items:center}
+.scr{flex:1;overflow-y:auto;scrollbar-width:none;position:relative}
+.scr::-webkit-scrollbar{display:none}
+.page{display:none;animation:viewIn .32s cubic-bezier(.22,.8,.36,1)}
+.page.active{display:block}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── Dashboard 头部 ── */
+.head{display:flex;align-items:center;gap:12px;padding:10px 20px 14px}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+.head .who{flex:1}
+.head .who b{font-size:17px;font-weight:750;display:block}
+.head .who small{color:var(--ink-2);font-size:12.5px}
+.bell{width:40px;height:40px;border-radius:50%;background:var(--bg-card);box-shadow:0 8px 24px rgba(30,27,46,.06);display:grid;place-items:center;position:relative}
+.bell i{width:8px;height:8px;border-radius:50%;background:var(--accent);position:absolute;top:9px;right:9px;border:2px solid #fff}
+
+/* ── 统计大卡（全 App 仅有的渐变之一）── */
+.hero-card{margin:4px 20px 18px;background:linear-gradient(160deg,var(--accent) 0%,var(--accent-deep) 100%);border-radius:24px;padding:22px;color:#fff;display:flex;gap:18px;align-items:center;box-shadow:0 14px 34px rgba(124,58,237,.35)}
+.ring{width:104px;height:104px;flex:0 0 auto;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .num b{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;display:block;line-height:1}
+.ring .num small{font-size:10px;opacity:.75;font-weight:600}
+.hero-card .info h3{font-size:17px;font-weight:750;margin-bottom:5px}
+.hero-card .info p{font-size:12px;line-height:1.55;opacity:.82}
+.hero-card .qual{display:inline-flex;margin-top:9px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.18);font-size:10.5px;font-weight:650}
+
+/* ── 区块标题 ── */
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;padding:0 20px;margin:20px 0 12px}
+.sec-h b{font-size:17px;font-weight:750}
+.sec-h a{color:var(--accent);font-size:12.5px;font-weight:650;text-decoration:none}
+
+/* ── 周历条 ── */
+.week{display:flex;gap:6px;padding:0 20px;margin-bottom:16px}
+.wd{flex:1;background:var(--bg-card);border-radius:16px;padding:10px 0 9px;text-align:center;box-shadow:0 6px 16px rgba(30,27,46,.05)}
+.wd small{display:block;font-size:10px;color:var(--ink-2);font-weight:650;margin-bottom:3px}
+.wd b{font-size:16px;font-weight:750;font-variant-numeric:tabular-nums}
+.wd.on{background:var(--accent);box-shadow:0 8px 20px rgba(124,58,237,.38)}
+.wd.on small,.wd.on b{color:#fff}
+
+/* ── 筛选胶囊 ── */
+.chips{display:flex;gap:8px;padding:0 20px;margin-bottom:14px}
+.chip{padding:7px 16px;border-radius:999px;background:var(--bg-card);font-size:12.5px;font-weight:650;color:var(--ink-2);box-shadow:0 4px 12px rgba(30,27,46,.04)}
+.chip.on{background:var(--accent);color:#fff}
+
+/* ── 任务行卡 ── */
+.task{display:flex;align-items:center;gap:13px;background:var(--bg-card);border-radius:16px;padding:15px 16px;margin:0 20px 10px;box-shadow:0 8px 24px rgba(30,27,46,.06)}
+.cb{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);flex:0 0 auto;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800;transition:.18s}
+.task.done .cb{background:var(--accent);border-color:var(--accent)}
+.task .t{flex:1;min-width:0}
+.task .t b{display:block;font-size:14.5px;font-weight:700}
+.task.done .t b{text-decoration:line-through;color:var(--ink-3)}
+.task .t small{color:var(--ink-2);font-size:11.5px;display:block;margin-top:3px}
+.task .arr{color:var(--ink-3);flex:0 0 auto;font-weight:700}
+
+/* ── 横向实验卡 ── */
+.hscroll{display:flex;gap:12px;padding:2px 20px 6px;overflow-x:auto;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.ecard{flex:0 0 240px;background:var(--bg-card);border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(30,27,46,.06)}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:10.5px;font-weight:750}
+.pill.violet{background:var(--accent-tint);color:var(--accent)}
+.pill.amberp{background:#FBF3DF;color:#A97B08}
+.pill.greenp{background:#E4F5EC;color:var(--ok)}
+.ecard h4{font-size:15px;font-weight:750;margin:10px 0 6px}
+.ecard p{font-size:12px;color:var(--ink-2);line-height:1.55}
+.bar{height:7px;border-radius:99px;background:var(--bg-inset);margin-top:13px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-deep))}
+.ecard .meta{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:7px;font-weight:600}
+
+/* ── 分组列表 ── */
+.group{background:var(--bg-card);border-radius:20px;margin:0 20px 12px;box-shadow:0 8px 24px rgba(30,27,46,.06);overflow:hidden}
+.grow{display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.grow:last-child{border-bottom:none}
+.gico{width:40px;height:40px;border-radius:14px;background:var(--accent-tint);color:var(--accent);display:grid;place-items:center;font-size:17px;font-weight:800;flex:0 0 auto}
+.grow .g{flex:1;min-width:0}
+.grow .g b{display:block;font-size:14px;font-weight:700}
+.grow .g small{color:var(--ink-2);font-size:11.5px}
+.grow .cnt{color:var(--ink-2);font-weight:750;font-size:14px;font-variant-numeric:tabular-nums}
+
+/* ── 表单（记录页）── */
+.form{padding:0 20px}
+.f-label{font-size:13px;font-weight:750;margin:18px 0 10px}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{padding:8px 13px;border-radius:999px;background:var(--bg-card);font-size:12.5px;font-weight:650;color:var(--ink-2);box-shadow:0 4px 12px rgba(30,27,46,.04)}
+.opt.on{background:var(--accent);color:#fff}
+.input{width:100%;min-height:96px;background:var(--bg-inset);border:none;border-radius:14px;padding:13px 15px;font-size:13.5px;color:var(--ink-1);resize:none;outline:none;font-family:inherit}
+.input::placeholder{color:var(--ink-3)}
+.btn-primary{display:block;width:calc(100% - 40px);margin:24px 20px 8px;padding:16px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;font-size:15.5px;font-weight:750;box-shadow:0 12px 28px rgba(124,58,237,.38)}
+
+/* ── 我的页 ── */
+.profile-head{text-align:center;padding:18px 20px 8px}
+.profile-head .avatar{width:76px;height:76px;margin:0 auto 12px;font-size:24px}
+.profile-head b{font-size:19px;font-weight:800;display:block}
+.profile-head small{color:var(--ink-2);font-size:12.5px}
+.toggle{width:46px;height:28px;border-radius:99px;background:var(--line);position:relative;flex:0 0 auto;transition:.2s}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(30,27,46,.18);transition:.2s}
+.toggle.on{background:var(--accent)}
+.toggle.on::after{left:21px}
+
+/* ── 底部导航 + FAB ── */
+.tabbar{flex:0 0 auto;height:86px;background:var(--bg-card);display:flex;align-items:stretch;padding:0 10px;position:relative;box-shadow:0 -6px 24px rgba(30,27,46,.05)}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--ink-3);font-size:10px;font-weight:650;position:relative;z-index:2}
+.tb svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tb.on{color:var(--accent)}
+.fab-wrap{width:84px;position:relative;z-index:2}
+.fab{position:absolute;left:50%;top:-26px;transform:translateX(-50%);width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;font-size:26px;font-weight:400;display:grid;place-items:center;box-shadow:0 12px 28px rgba(124,58,237,.45)}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(30,27,46,.25);z-index:5}
+
+/* ── Sheet 弹层 ── */
+.sheet-bg{position:absolute;inset:0;background:rgba(30,27,46,.42);z-index:40;display:none}
+.sheet-bg.open{display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg-card);border-radius:26px 26px 0 0;padding:14px 22px 40px;z-index:41;display:none;animation:sheetUp .3s cubic-bezier(.22,.8,.36,1)}
+.sheet.open{display:block}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+.grabber{width:44px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 16px}
+.sheet h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.sheet .sub{color:var(--ink-2);font-size:12.5px;margin-bottom:16px;line-height:1.55}
+.s-act{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+.s-act:last-of-type{border-bottom:none}
+.s-act .ico{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:16px;flex:0 0 auto}
+.s-act b{font-size:14.5px;font-weight:700;display:block}
+.s-act small{color:var(--ink-2);font-size:11.5px}
+
+.disclaim{position:absolute;bottom:88px;left:0;right:0;text-align:center;font-size:9.5px;color:var(--ink-3);z-index:1;pointer-events:none;padding:0 90px}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span class="right">▮▮▮ ⌁ ▐▐</span></div>
+
+  <div class="scr">
+
+    <!-- ═══ 今天 ═══ -->
+    <div class="page active" id="pg-today">
+      <div class="head">
+        <div class="avatar">CC</div>
+        <div class="who"><b>Hi, Chris 👋</b><small>8月23日 周日 · 第 16 天实验期</small></div>
+        <div class="bell">🔔<i></i></div>
+      </div>
+
+      <div class="hero-card">
+        <div class="ring">
+          <svg width="104" height="104"><circle cx="52" cy="52" r="45" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="9"/><circle cx="52" cy="52" r="45" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="203 283" stroke-dashoffset="79"/></svg>
+          <div class="num"><span><b>72%</b><small>今日电量</small></span></div>
+        </div>
+        <div class="info">
+          <h3>恢复中 · 偏好上午训练</h3>
+          <p>综合睡眠时长、HRV 与昨日运动负荷估算。昨晚深睡占比偏高，适合安排力量训练。</p>
+          <span class="qual">证据窗口 · 近 7 天</span>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="wd"><small>周一</small><b>17</b></div>
+        <div class="wd"><small>周二</small><b>18</b></div>
+        <div class="wd"><small>周三</small><b>19</b></div>
+        <div class="wd"><small>周四</small><b>20</b></div>
+        <div class="wd"><small>周五</small><b>21</b></div>
+        <div class="wd"><small>周六</small><b>22</b></div>
+        <div class="wd on"><small>周日</small><b>23</b></div>
+      </div>
+
+      <div class="sec-h"><b>Today Mission</b><a data-go="记录" style="cursor:pointer">换一个 ›</a></div>
+      <div class="task" id="missionRow">
+        <div class="cb" onclick="toggleMission(this)">✓</div>
+        <div class="t"><b>30 分钟力量训练 · 下肢</b><small>建议 18:00 前 · 来自本周「训练时段与睡眠」实验</small></div>
+        <div class="arr" onclick="openSheet()">⋯</div>
+      </div>
+
+      <div class="sec-h"><b>进行中的实验</b><a data-go="实验" style="cursor:pointer">全部 ›</a></div>
+      <div class="hscroll">
+        <div class="ecard">
+          <span class="pill violet">进行中 · 第 5 天</span>
+          <h4>训练时段与睡眠质量</h4>
+          <p>假设：傍晚训练比早晨训练提升深睡占比。观察指标：深睡%、入睡耗时。</p>
+          <div class="bar"><i style="width:62%"></i></div>
+          <div class="meta"><span>观察窗口 14 天</span><span>剩 9 天</span></div>
+        </div>
+        <div class="ecard">
+          <span class="pill amberp">分析中</span>
+          <h4>咖啡因截止时间</h4>
+          <p>14:00 后不摄入咖啡因，对比 HRV 与入睡耗时变化。</p>
+          <div class="bar"><i style="width:88%"></i></div>
+          <div class="meta"><span>观察窗口 14 天</span><span>剩 2 天</span></div>
+        </div>
+      </div>
+
+      <div class="sec-h"><b>快捷记录</b></div>
+      <div class="group">
+        <div class="grow" data-go="记录" style="cursor:pointer">
+          <div class="gico">🙂</div>
+          <div class="g"><b>Body Check</b><small>现在的身体感受怎么样？</small></div>
+          <div class="cnt">›</div>
+        </div>
+        <div class="grow" data-go="记录" style="cursor:pointer">
+          <div class="gico">⚡️</div>
+          <div class="g"><b>精力与压力</b><small>五档快速打点，可当天撤回</small></div>
+          <div class="cnt">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 旅程 ═══ -->
+    <div class="page" id="pg-journey">
+      <div class="head"><div class="who" style="padding-left:4px"><b>旅程</b><small>90 天视角 · 方向比速度重要</small></div></div>
+      <div class="hero-card">
+        <div class="ring">
+          <svg width="104" height="104"><circle cx="52" cy="52" r="45" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="9"/><circle cx="52" cy="52" r="45" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="141 283"/></svg>
+          <div class="num"><span><b>50%</b><small>第 2 / 4 阶段</small></span></div>
+        </div>
+        <div class="info">
+          <h3>恢复代谢灵活性</h3>
+          <p>当前阶段：建立稳定训练节律。已完成基线校准与首轮实验验证。</p>
+          <span class="qual">窗口 · Day 1 – 90</span>
+        </div>
+      </div>
+      <div class="chips">
+        <div class="chip on">30 天</div><div class="chip">60 天</div><div class="chip">90 天</div>
+      </div>
+      <div class="sec-h"><b>里程碑</b><span style="font-size:12px;color:var(--ink-2)">3 个</span></div>
+      <div class="group">
+        <div class="grow"><div class="gico">🎯</div><div class="g"><b>完成基线校准</b><small>8 月 3 日 · 14 天连续佩戴与记录</small></div><div class="cnt">✓</div></div>
+        <div class="grow"><div class="gico">🧪</div><div class="g"><b>首个实验闭环</b><small>8 月 15 日 · 咖啡因 vs 入睡耗时</small></div><div class="cnt">✓</div></div>
+        <div class="grow"><div class="gico">📈</div><div class="g"><b>HRV 基线提升 8%</b><small>8 月 21 日 · 与第 1 周对比</small></div><div class="cnt">✓</div></div>
+      </div>
+      <div class="group">
+        <div class="grow"><div class="gico">⏳</div><div class="g"><b>下一站：稳定节律期收官</b><small>预计 9 月上旬 · 需完成 4 周训练节律观察</small></div><div class="arr">›</div></div>
+      </div>
+      <p style="margin:6px 20px 16px;font-size:11px;color:var(--ink-3);line-height:1.6">趋势线不跨越数据缺口伪造连续性；数据不足时以你的反馈和实验时间线解释。</p>
+    </div>
+
+    <!-- ═══ 实验 ═══ -->
+    <div class="page" id="pg-experiments">
+      <div class="head"><div class="who" style="padding-left:4px"><b>实验</b><small>AI 提假设 · 你授权后才开始</small></div></div>
+      <div class="chips"><div class="chip on">全部</div><div class="chip">进行中</div><div class="chip">待决定</div><div class="chip">已完成</div></div>
+      <div class="hscroll">
+        <div class="ecard">
+          <span class="pill violet">进行中 · 第 5 天</span>
+          <h4>训练时段与睡眠质量</h4>
+          <p>读取类别：睡眠阶段、静息心率。成功标准：深睡占比提升 ≥5%。随时可暂停或停止。</p>
+          <div class="bar"><i style="width:62%"></i></div>
+          <div class="meta"><span>授权于 8 月 18 日</span><span>剩 9 天</span></div>
+        </div>
+      </div>
+      <div class="sec-h"><b>待你决定</b><span style="font-size:12px;color:var(--ink-2)">1 个提案</span></div>
+      <div class="ecard" style="flex:1;margin:0 20px 12px">
+        <span class="pill amberp">新提案</span>
+        <h4>晚间光照与入睡耗时</h4>
+        <p>假设：22:00 后调暗室内光源，入睡耗时缩短 ≥10 分钟。<br><br>授权前可见：假设与干预 · 读取类别与窗口 · 观察指标与门槛 · 成功/停止/删除规则。</p>
+        <div style="display:flex;gap:9px;margin-top:14px">
+          <button class="opt on" style="flex:1;text-align:center" onclick="alert('Demo：进入授权确认（展示四要素）')">开始实验</button>
+          <button class="opt" style="flex:1;text-align:center">先不要</button>
+        </div>
+      </div>
+      <div class="sec-h"><b>已完成</b><span style="font-size:12px;color:var(--ink-2)">1 个</span></div>
+      <div class="group">
+        <div class="grow"><div class="gico">☕️</div><div class="g"><b>咖啡因截止时间</b><small>结果：14:00 截止使入睡耗时缩短 12 分钟 · 已写入洞察</small></div><div class="cnt">›</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ 记录 ═══ -->
+    <div class="page" id="pg-log">
+      <div class="head"><div class="who" style="padding-left:4px"><b>记录</b><small>结构化输入 · 全部可撤回</small></div></div>
+      <div class="form">
+        <div class="f-label">Body Check · 现在的身体感受</div>
+        <div class="opts" data-single>
+          <button class="opt">充沛</button><button class="opt on">正常</button><button class="opt">有点累</button><button class="opt">很累</button><button class="opt">不适</button>
+        </div>
+        <div class="f-label">今天的精力</div>
+        <div class="opts" data-single>
+          <button class="opt">低</button><button class="opt">中低</button><button class="opt on">中</button><button class="opt">中高</button><button class="opt">高</button>
+        </div>
+        <div class="f-label">压力水平</div>
+        <div class="opts" data-single>
+          <button class="opt">低</button><button class="opt on">中</button><button class="opt">高</button>
+        </div>
+        <div class="f-label">备注（可选）</div>
+        <textarea class="input" placeholder="一句话就好，默认不会存为长期记忆…"></textarea>
+      </div>
+      <button class="btn-primary" onclick="this.textContent='已保存 ✓';setTimeout(()=>this.textContent='保存今天的记录',1400)">保存今天的记录</button>
+      <p style="margin:10px 20px 20px;font-size:11px;color:var(--ink-3)">保存后显示时间与当天撤回入口；失败会保留已选内容。</p>
+    </div>
+
+    <!-- ═══ 我的 ═══ -->
+    <div class="page" id="pg-me">
+      <div class="profile-head">
+        <div class="avatar">CC</div>
+        <b>Chris CCC</b>
+        <small>目标：恢复代谢灵活性 · Day 16 / 90</small>
+      </div>
+      <div class="sec-h"><b>数据来源</b><span style="font-size:11px;color:var(--ink-2)">每项可单独撤回</span></div>
+      <div class="group">
+        <div class="grow"><div class="gico">❤️</div><div class="g"><b>心率与 HRV</b><small>用于恢复评估 · 最近同步 07:12</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="grow"><div class="gico">😴</div><div class="g"><b>睡眠阶段</b><small>用于电量与恢复趋势</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="grow"><div class="gico">🏃</div><div class="g"><b>体能训练</b><small>用于运动负荷估算</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+      <div class="sec-h"><b>连接</b></div>
+      <div class="group">
+        <div class="grow"><div class="gico">💬</div><div class="g"><b>微信 ClawBot 提醒</b><small>只发送你选择的待办摘要 · 当前未连接</small></div><div class="cnt">›</div></div>
+        <div class="grow"><div class="gico">⌚️</div><div class="g"><b>Apple Health 授权明细</b><small>查看每项数据的用途与边界</small></div><div class="cnt">›</div></div>
+      </div>
+      <div class="sec-h"><b>隐私与数据</b></div>
+      <div class="group" style="margin-bottom:24px">
+        <div class="grow"><div class="gico">📦</div><div class="g"><b>导出我的数据</b><small>选择范围后生成安全下载</small></div><div class="cnt">›</div></div>
+        <div class="grow"><div class="gico">🗑</div><div class="g"><b>删除数据或注销</b><small>二次确认 + 影响说明 + 证据回执</small></div><div class="cnt">›</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="disclaim">虚构示例数据 · 非医疗建议</div>
+
+  <!-- ═══ 底部导航 + FAB ═══ -->
+  <div class="tabbar">
+    <div class="tb on" data-pg="today" onclick="go('today',this)">
+      <svg viewBox="0 0 24 24"><path d="M12 3v3M5.6 5.6l2 2M3 12h3M18.4 5.6l-2 2M21 12h-3M7 18a5 5 0 0 1 10 0"/><path d="M4 21h16"/></svg>今天</div>
+    <div class="tb" data-pg="journey" onclick="go('journey',this)">
+      <svg viewBox="0 0 24 24"><path d="M4 19c3-6 6-9 8-9s5 3 8 9"/><circle cx="12" cy="6" r="2.5"/></svg>旅程</div>
+    <div class="fab-wrap"><button class="fab" data-fab onclick="go('log',this)" title="快捷记录">＋</button></div>
+    <div class="tb" data-pg="experiments" onclick="go('experiments',this)">
+      <svg viewBox="0 0 24 24"><path d="M9 3v6l-5 9a2 2 0 0 0 1.8 3h12.4A2 2 0 0 0 20 18l-5-9V3"/><path d="M8 3h8"/></svg>实验</div>
+    <div class="tb" data-pg="me" onclick="go('me',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>我的</div>
+  </div>
+  <div class="homebar"></div>
+
+  <!-- Mission 操作 Sheet -->
+  <div class="sheet-bg" onclick="closeSheet()"></div>
+  <div class="sheet" id="missionSheet">
+    <div class="grabber"></div>
+    <h3>30 分钟力量训练 · 下肢</h3>
+    <p class="sub">每个动作都可完成、调轻或跳过——没有扣分，没有打卡惩罚。</p>
+    <div class="s-act"><div class="ico" style="background:var(--accent-tint);color:var(--accent)">✓</div><div style="flex:1"><b>完成这件事</b><small>提交后显示时间与审计确认</small></div><div class="cnt">›</div></div>
+    <div class="s-act"><div class="ico" style="background:#FBF3DF;color:#A97B08">↓</div><div style="flex:1"><b>调轻一档</b><small>换成 15 分钟 或 只做上半身 · 仍在观察范围</small></div><div class="cnt">›</div></div>
+    <div class="s-act"><div class="ico" style="background:var(--bg-inset);color:var(--ink-2)">–</div><div style="flex:1"><b>今天先跳过</b><small>原因可选 · 不影响任何评分</small></div><div class="cnt">›</div></div>
+  </div>
+</div>
+
+<script>
+function go(pg, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+pg).classList.add('active');
+  document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));
+  document.querySelector('[data-fab]').style.boxShadow = pg==='log' ? '0 12px 28px rgba(124,58,237,.45), 0 0 0 3px var(--accent-tint)' : '';
+  if(el && el.classList.contains('tb'))el.classList.add('on');
+  if(pg==='log')document.querySelector('.scr').scrollTop=0;else document.querySelector('.scr').scrollTop=0;
+}
+function toggleMission(cb){
+  cb.closest('.task').classList.toggle('done');
+  cb.textContent = cb.closest('.task').classList.contains('done')?'✓':'';
+}
+function openSheet(){document.querySelector('.sheet-bg').classList.add('open');document.getElementById('missionSheet').classList.add('open')}
+function closeSheet(){document.querySelector('.sheet-bg').classList.remove('open');document.getElementById('missionSheet').classList.remove('open')}
+document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>{const t=el.dataset.go;const map={'记录':'log','实验':'experiments'};if(map[t]){const tb=document.querySelector('.tb[data-pg="'+map[t]+'"]');go(map[t],tb)}}));
+// 单选胶囊组
+document.querySelectorAll('[data-single]').forEach(g=>{
+  g.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{g.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));o.classList.add('on')});
+});
+// 周历选择
+document.querySelectorAll('.wd').forEach(d=>d.onclick=()=>{document.querySelectorAll('.wd').forEach(x=>x.classList.remove('on'));d.classList.add('on')});
+// 筛选胶囊
+document.querySelectorAll('.chips').forEach(g=>{g.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{g.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on')})});
+// 开关
+document.querySelectorAll('.toggle').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+</script>
+</body>
+</html>

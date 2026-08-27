@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitClew 产品功能说明 · 评审版 v1</title>
+<!--
+  Step 0 调研资产激活声明（九条内化设计观）：
+  ① 单色纪律：生长绿 #2F6B4F 唯一强调色，面积 <10% ② 留白：section 间距 96px ③ hairline 描边，阴影仅悬浮导航一层
+  ④ 平台词硬约束：iOS 形态 ⑤ 反 AI 默认脸（无紫无渐变无 icon 卡片阵）⑥ 布局原语：每页统一"左截图右三栏"
+  ⑦ 交互三件套：锚点 scrollIntoView + 入场动画 + 导航激活态 ⑧ 观点：差距直接标出来，不藏 ⑨ 本页即 Step 0 声明
+  Token 源：DESIGN.md（内部）
+-->
+<style>
+  :root{
+    --bg-page:#F6F5F0; --bg-card:#FFFFFF; --ink:#2A2D28; --ink-2:#6B6F66; --ink-3:#9B9E94;
+    --accent:#2F6B4F; --accent-soft:#EAF1ED; --coral:#C4573F; --coral-soft:#F7ECE8;
+    --amber:#B08A3E; --amber-soft:#F6F0E2; --line:#E5E2DA; --line-2:#D8D4C8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg-page);color:var(--ink);font-family:-apple-system,"PingFang SC","SF Pro SC",sans-serif;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--accent-soft)}
+
+  /* ── 顶部悬浮导航（全站唯一阴影层） ── */
+  nav{position:sticky;top:0;z-index:50;background:rgba(246,245,240,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);box-shadow:0 1px 12px rgba(42,45,40,.05)}
+  .nav-in{max-width:1200px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .nav-brand{font-weight:800;font-size:15px;letter-spacing:.02em;white-space:nowrap}
+  .nav-brand em{font-style:normal;color:var(--accent)}
+  .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+  .nav-links a{padding:5px 12px;border-radius:99px;font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none;transition:all .18s ease}
+  .nav-links a:hover{color:var(--ink);background:var(--accent-soft)}
+  .nav-links a.active{color:#fff;background:var(--accent)}
+
+  main{max-width:1200px;margin:0 auto;padding:0 32px}
+  section{padding:88px 0 8px;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:none}
+  .view-in{animation:viewIn .45s cubic-bezier(.22,.8,.36,1) both}
+  @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .kicker{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+  h2{font-size:30px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+  .sub{color:var(--ink-2);max-width:760px;margin-bottom:36px}
+  h3{font-size:16px;font-weight:750;margin-bottom:12px}
+  h3 .n{display:inline-block;min-width:22px;color:var(--accent);font-variant-numeric:tabular-nums}
+
+  /* ── 通用卡 ── */
+  .card{background:var(--bg-card);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+  /* ── 流程带（布局原语之一：横向节点+箭头） ── */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:14px}
+  .fnode{background:var(--bg-card);border:1px solid var(--line-2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:650;position:relative;flex:1;min-width:118px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:2px}
+  .fnode small{font-weight:500;color:var(--ink-3);font-size:11.5px;line-height:1.4}
+  .fnode.hot{border-color:var(--accent);background:var(--accent-soft)}
+  .fnode.warn{border-color:var(--coral);background:var(--coral-soft)}
+  .fnode.amber{border-color:var(--amber);background:var(--amber-soft)}
+  .farr{align-self:center;color:var(--ink-3);padding:0 6px;font-size:14px;flex:0 0 auto}
+  .fbranch{flex-direction:column;align-items:stretch;flex:1;min-width:118px;gap:6px}
+  .fbranch .fnode{flex:0 0 auto}
+
+  /* ── 表格原语 ── */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;font-size:11.5px;font-weight:750;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--line-2)}
+  td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td b{font-weight:700}
+  .tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap}
+  .tag.ok{background:var(--accent-soft);color:var(--accent)}
+  .tag.gap{background:var(--coral-soft);color:var(--coral)}
+  .tag.half{background:var(--amber-soft);color:var(--amber)}
+  .tag.plain{background:#F0EEE6;color:var(--ink-2)}
+
+  /* ── 页面逐帧原语：左截图右三栏 ── */
+  .frame{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:start}
+  @media(max-width:900px){.frame{grid-template-columns:1fr}}
+  .phone{background:#fff;border:1px solid var(--line-2);border-radius:34px;padding:10px;position:sticky;top:76px}
+  .phone img{width:100%;display:block;border-radius:26px}
+  .phone figcaption{text-align:center;font-size:11.5px;color:var(--ink-3);padding:8px 0 2px}
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .blk-list{display:flex;flex-direction:column;gap:0}
+  .blk-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;align-items:baseline}
+  .blk-row:last-child{border-bottom:none}
+  .blk-row .no{flex:0 0 26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+  .blk-row .nm{flex:0 0 168px;font-weight:700}
+  .blk-row .ds{color:var(--ink-2);flex:1}
+
+  /* ── 决策清单 ── */
+  .q{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .q:last-child{border-bottom:none}
+  .q .qn{flex:0 0 34px;font-weight:800;color:var(--accent);font-size:15px}
+  .q .qt{font-weight:700}
+  .q .qd{color:var(--ink-2);font-size:13.5px;margin-top:2px}
+
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+  .meta span{font-size:12px;color:var(--ink-2);border:1px solid var(--line-2);border-radius:99px;padding:4px 12px;background:var(--bg-card)}
+  footer{max-width:1200px;margin:0 auto;padding:40px 32px 64px;color:var(--ink-3);font-size:12.5px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-in">
+    <div class="nav-brand">FitClew <em>功能说明</em></div>
+    <div class="nav-links" id="navLinks">
+      <a href="#s1" class="active">总览</a>
+      <a href="#s2">全局旅程</a>
+      <a href="#s3">今天</a>
+      <a href="#s4">旅程</a>
+      <a href="#s5">实验</a>
+      <a href="#s6">记录</a>
+      <a href="#s7">我的</a>
+      <a href="#s8">注册登录</a>
+      <a href="#s9">对标</a>
+      <a href="#s10">待决策</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════ S1 总览 ═══════════ -->
+<section id="s1" class="view-in">
+  <div class="kicker">S1 · 产品总览</div>
+  <h2>一个 AI 健康实验伙伴，不是一个数据仪表盘</h2>
+  <p class="sub">FitClew 的产品骨架是四层时间结构：越靠近"现在"，动作越具体；越靠近"90 天"，认知越结构化。所有判断都来自「AI 提假设 → 用户授权 → 观察 → 验证 → 学习」的实验循环，而不是直接给健康评分。</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <h3>四层时间结构（数据模型 → 界面的映射）</h3>
+    <div class="flow">
+      <div class="fnode hot">90 Day Journey<small>长期方向与阶段<br>数据实体 Journey</small></div><div class="farr">→</div>
+      <div class="fnode hot">This Week Experiment<small>本周在验证的假设<br>数据实体 Experiment</small></div><div class="farr">→</div>
+      <div class="fnode">Today Mission<small>今天唯一主行动<br>数据实体 Mission</small></div><div class="farr">→</div>
+      <div class="fnode">Right Now Action<small>实时策略结果<br>短期计算不落第二库</small></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">对应五 Tab：今天 = Mission + Right Now ｜ 旅程 = Journey ｜ 实验 = Experiment ｜ 记录 = 主观输入（Body Check / 精力 / 睡眠感受）｜ 我的 = 授权与数据控制</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>AI Native 主循环</h3>
+      <div class="flow" style="flex-direction:column;align-items:stretch">
+        <div class="fnode">AI 提假设<small>基于授权聚合数据 + 用户目标，提出低风险个人实验</small></div>
+        <div class="farr" style="transform:rotate(90deg);align-self:center">→</div>
+        <div class="fnode hot">用户授权<small>看到假设、读取类别、观察指标、停止条件后才开始</small></div>
+        <div class="farr" style="transform:rotate(90deg);align-self:center">→</div>
+        <div class="fnode">AI 观察 → 验证 → 学习<small>Observation → ExperimentResult → 确认后的 Memory/Insight → 下一个实验</small></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>产品红线（写进交互合同的）</h3>
+      <table>
+        <tr><td>无数据不生成分数或结论</td></tr>
+        <tr><td>不做羞耻、扣分、连续打卡惩罚</td></tr>
+        <tr><td>健康判断必须展示数据时间窗、质量和限制</td></tr>
+        <tr><td>授权、同步、ClawBot、删除显示真实状态，不做装饰性假开关</td></tr>
+        <tr><td>首发排除：餐食照片识别、医疗诊断、模型直读原始健康数据</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S2 全局旅程 ═══════════ -->
+<section id="s2">
+  <div class="kicker">S2 · 全局旅程</div>
+  <h2>从启动到可用：注册只是第一站，授权才是门槛</h2>
+  <p class="sub">全局状态机决定用户看到什么。健康内容在完成 HealthKit 授权前一律不展示——这是与读手表 Insight 最大的结构差异之一（详见 S9 对标）。</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <h3>启动 → 主页的完整链路</h3>
+    <div class="flow">
+      <div class="fnode">启动<small>读安全会话<br>加载中不显示健康数据</small></div><div class="farr">→</div>
+      <div class="fnode">注册 / 登录<small>微信方案见 S8</small></div><div class="farr">→</div>
+      <div class="fnode hot">Onboarding O1–O6<small>价值边界→90天方向<br>→数据用途→授权→首同步→Body Check</small></div><div class="farr">→</div>
+      <div class="fnode">首次同步<small>持续或暂停<br>行为必须明确</small></div><div class="farr">→</div>
+      <div class="fnode hot">主页五态<small>ready / baseline_building<br>restricted / failed / ready完整</small></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">Onboarding 六步可中断可恢复：重启 App 回到最近未完成步骤，已完成步骤不重复。</p>
+  </div>
+
+  <div class="card">
+    <h3>HealthKit 授权的四种结果与去向</h3>
+    <div class="flow">
+      <div class="fbranch">
+        <div class="fnode">完全允许</div>
+        <div class="fnode hot">展示类别与用途 → 开始同步 → Today 完整态</div>
+      </div>
+      <div class="fbranch">
+        <div class="fnode">部分允许</div>
+        <div class="fnode">显示可用/缺失项 → 同步可用类别 → baseline_building</div>
+      </div>
+      <div class="fbranch">
+        <div class="fnode warn">拒绝</div>
+        <div class="fnode warn">受限体验：保留目标、手动记录、主动重授权入口<br>禁止反复逼迫授权</div>
+      </div>
+      <div class="fbranch">
+        <div class="fnode amber">设备不可用</div>
+        <div class="fnode amber">说明设备/系统限制，不猜测原因</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S3 今天 ═══════════ -->
+<section id="s3">
+  <div class="kicker">S3 · 页面一「今天」</div>
+  <h2>每日行动中心：一个视口，一个判断，一个动作</h2>
+  <p class="sub">Today 是全产品的枢纽。它不展示数据海洋，只回答三个问题：我现在什么状态、下一步做什么、为什么。</p>
+
+  <div class="frame">
+    <figure class="phone">
+      <img src="screenshots/fitclew-v3-today.png" alt="今天页截图">
+      <figcaption>Demo v3 · 今天页（真实数据版式）</figcaption>
+    </figure>
+    <div class="stack">
+      <div class="card">
+        <h3><span class="n">01</span>页面区块结构（自上而下）</h3>
+        <div class="blk-list">
+          <div class="blk-row"><span class="no">1</span><span class="nm">Current State</span><span class="ds">当前状态文字 + 证据时间窗 + 数据质量标识</span></div>
+          <div class="blk-row"><span class="no">2</span><span class="nm">One Next Move</span><span class="ds">今天唯一主行动，三个出口：完成 / 调轻 / 跳过</span></div>
+          <div class="blk-row"><span class="no">3</span><span class="nm">Why</span><span class="ds">数据来源 + 局限说明，判断可追溯</span></div>
+          <div class="blk-row"><span class="no">4</span><span class="nm">Active Experiment</span><span class="ds">进行中实验的当前状态 + 停止入口</span></div>
+          <div class="blk-row"><span class="no">5</span><span class="nm">Next Check</span><span class="ds">下次重新评估的条件（不是日期，是条件）</span></div>
+          <div class="blk-row"><span class="no">6</span><span class="nm">Body Check 入口</span><span class="ds">主观感受快速记录（Demo 里已做成白卡情绪选择器）</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>Mission 写入流（幂等，防重复提交）</h3>
+        <div class="flow">
+          <div class="fnode">完成<small>按钮立即禁用 → 提交中<br>成功显示时间与审计确认</small></div><div class="farr">／</div>
+          <div class="fnode">调轻<small>Sheet 给 2–3 个允许的替代方案<br>说明仍在观察什么 · 关闭不写入</small></div><div class="farr">／</div>
+          <div class="fnode">跳过<small>原因可选 · 无扣分无羞耻文案<br>服务端幂等键防重复记录</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>四态与 Demo 差距</h3>
+        <table>
+          <tr><th>状态</th><th>用户看到</th><th>状态</th></tr>
+          <tr><td><b>ready</b></td><td>状态 + 时间窗 + 质量 + 下一步 + Why</td><td><span class="tag half">Demo 仅完整态</span></td></tr>
+          <tr><td><b>baseline_building</b></td><td>已有输入、缺口、预计时间、低负担行动，不给分数</td><td><span class="tag gap">Demo 未实现</span></td></tr>
+          <tr><td><b>restricted</b></td><td>授权限制说明 + 手动记录 + 数据用途入口</td><td><span class="tag gap">Demo 未实现</span></td></tr>
+          <tr><td><b>failed</b></td><td>失败归因 + 本地保存状态 + 重试，不用"AI 思考中"掩盖</td><td><span class="tag gap">Demo 未实现</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S4 旅程 ═══════════ -->
+<section id="s4">
+  <div class="kicker">S4 · 页面二「旅程」</div>
+  <h2>90 天方向感：先看阶段，再看趋势</h2>
+  <p class="sub">旅程页回答"我朝我的方向走了多远"。规则：先显示 90 天方向与当前阶段，再展示趋势——顺序不能反。</p>
+
+  <div class="frame">
+    <figure class="phone">
+      <img src="screenshots/fitclew-v3-journey.png" alt="旅程页截图">
+      <figcaption>Demo v3 · 旅程页</figcaption>
+    </figure>
+    <div class="stack">
+      <div class="card">
+        <h3><span class="n">01</span>区块结构</h3>
+        <div class="blk-list">
+          <div class="blk-row"><span class="no">1</span><span class="nm">方向与阶段</span><span class="ds">90 天方向 + 当前所处阶段（Onboarding O2 选定，可后补）</span></div>
+          <div class="blk-row"><span class="no">2</span><span class="nm">时间窗切换</span><span class="ds">30 / 60 / 90 天；每次切换保留来源、质量和缺口说明</span></div>
+          <div class="blk-row"><span class="no">3</span><span class="nm">趋势图</span><span class="ds">点击图表 → 文字摘要 + 范围 + 缺口 + 相关实验事件</span></div>
+          <div class="blk-row"><span class="no">4</span><span class="nm">里程碑</span><span class="ds">日期 + 证据 + 相关行动 + 可撤回/删除状态</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>硬规则</h3>
+        <div class="flow">
+          <div class="fnode warn">趋势线不得跨越数据缺口伪造连续性</div>
+          <div class="farr">＋</div>
+          <div class="fnode">数据不足时用用户反馈和实验时间线解释</div>
+          <div class="farr">＋</div>
+          <div class="fnode warn">不放空 KPI 卡充数</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>Demo 差距</h3>
+        <table>
+          <tr><td><span class="tag half">部分</span></td><td>Demo 有趋势视觉与阶段卡，缺 30/60/90 切换的缺口说明联动</td></tr>
+          <tr><td><span class="tag gap">未实现</span></td><td>里程碑的撤回/删除状态；点击图表的文字摘要浮层</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S5 实验 ═══════════ -->
+<section id="s5">
+  <div class="kicker">S5 · 页面三「实验」</div>
+  <h2>产品的灵魂：假设制实验，授权后才跑</h2>
+  <p class="sub">这是 FitClew 与所有健康 App 的本质区别——AI 不直接下结论，而是提案一个可停止的低风险实验，用户授权后才开始观察。</p>
+
+  <div class="frame">
+    <figure class="phone">
+      <img src="screenshots/fitclew-v3-experiments.png" alt="实验页截图">
+      <figcaption>Demo v3 · 实验页</figcaption>
+    </figure>
+    <div class="stack">
+      <div class="card">
+        <h3><span class="n">01</span>列表结构：三组</h3>
+        <div class="flow">
+          <div class="fnode hot">进行中 Active</div><div class="farr">·</div>
+          <div class="fnode">等待决定 Proposed</div><div class="farr">·</div>
+          <div class="fnode">已完成 Completed</div>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:10px">卡片只显示：名称、目的、一句状态、进入详情的动作。完整指标只在详情展示。</p>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>实验状态机</h3>
+        <div class="flow">
+          <div class="fnode">proposed</div><div class="farr">→</div>
+          <div class="fnode hot">authorised<small>用户看过四要素后授权</small></div><div class="farr">→</div>
+          <div class="fnode">active</div><div class="farr">→</div>
+          <div class="fnode">analysing</div><div class="farr">→</div>
+          <div class="fnode">completed</div>
+        </div>
+        <div class="flow" style="margin-top:8px">
+          <div class="fbranch"><div class="fnode amber">paused 暂停</div></div>
+          <div class="fbranch"><div class="fnode warn">stopped 停止<small>需确认影响；停止后派生结果按规则失效或删除</small></div></div>
+          <div class="fbranch"><div class="fnode warn">rejected 拒绝提案</div></div>
+          <div class="fbranch"><div class="fnode">completed → user_feedback → 确认后的记忆</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>授权 Sheet 必须可见的四要素</h3>
+        <div class="blk-list">
+          <div class="blk-row"><span class="no">1</span><span class="nm">假设与干预行为</span><span class="ds">这个实验到底在验证什么</span></div>
+          <div class="blk-row"><span class="no">2</span><span class="nm">读取类别与窗口</span><span class="ds">读什么数据、purpose、基线窗与实验窗</span></div>
+          <div class="blk-row"><span class="no">3</span><span class="nm">观察指标与门槛</span><span class="ds">看哪些指标、质量门槛、不确定性</span></div>
+          <div class="blk-row"><span class="no">4</span><span class="nm">成功/停止/删除规则</span><span class="ds">什么算成功、何时停、数据保留与删除</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">04</span>Demo 差距</h3>
+        <table>
+          <tr><td><span class="tag half">部分</span></td><td>三组列表已有；缺 Proposed 卡片的授权入口与 Sheet 四要素</td></tr>
+          <tr><td><span class="tag gap">未实现</span></td><td>暂停/停止的影响确认流；结果页的用户反馈与"确认记忆"</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S6 记录 ═══════════ -->
+<section id="s6">
+  <div class="kicker">S6 · 页面四「记录」</div>
+  <h2>结构化主观输入：五类，全部可撤回</h2>
+  <p class="sub">记录页是 AI 观察数据之外的主观信号源。设计原则：结构化选择优先，不给模型自由文本，默认不存为长期记忆。</p>
+
+  <div class="frame">
+    <figure class="phone">
+      <img src="screenshots/fitclew-v3-log.png" alt="记录页截图">
+      <figcaption>Demo v3 · 记录页</figcaption>
+    </figure>
+    <div class="stack">
+      <div class="card">
+        <h3><span class="n">01</span>五类记录</h3>
+        <table>
+          <tr><th>类型</th><th>输入</th><th>成功后</th></tr>
+          <tr><td><b>精力</b></td><td>五级文字标签</td><td>保存时间 + 当天撤回入口</td></tr>
+          <tr><td><b>睡眠感受</b></td><td>简短选项 + 可选标签</td><td>结构化保存，不默认成长期记忆</td></tr>
+          <tr><td><b>压力</b></td><td>低/中/高 + 可选来源</td><td>可撤回；无自由文本</td></tr>
+          <tr><td><b>训练感受</b></td><td>完成/偏累/恢复良好/暂不记录</td><td>可关联当日 Mission</td></tr>
+          <tr><td><b>不适停止信号</b></td><td>明确结构化选择</td><td>提示停止实验 + 寻求专业帮助边界，不诊断</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>写入状态机（每一条）</h3>
+        <div class="flow">
+          <div class="fnode">保存中</div><div class="farr">→</div>
+          <div class="fnode hot">成功<small>显示时间 + 撤回入口</small></div><div class="farr">／</div>
+          <div class="fnode warn">失败<small>保留已选内容 · 防重复点击<br>服务端幂等 · 可重试</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>Demo 差距</h3>
+        <table>
+          <tr><td><span class="tag ok">已实现</span></td><td>情绪选择器（Body Check 雏形）白卡交互</td></tr>
+          <tr><td><span class="tag gap">未实现</span></td><td>五类记录的完整入口；撤回流；失败重试态</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S7 我的 ═══════════ -->
+<section id="s7">
+  <div class="kicker">S7 · 页面五「我的」</div>
+  <h2>数据主权页：授权、导出、删除、ClawBot</h2>
+  <p class="sub">这一页是信任的锚。所有状态真实可见，所有破坏性操作有二次确认和证据回执。</p>
+
+  <div class="frame">
+    <figure class="phone">
+      <img src="screenshots/fitclew-v3-profile.png" alt="我的页截图">
+      <figcaption>Demo v3 · 我的页</figcaption>
+    </figure>
+    <div class="stack">
+      <div class="card">
+        <h3><span class="n">01</span>数据源与授权</h3>
+        <div class="blk-list">
+          <div class="blk-row"><span class="no">·</span><span class="nm">Apple Health</span><span class="ds">显示获准类别、最近同步、限制、每项 purpose</span></div>
+          <div class="blk-row"><span class="no">·</span><span class="nm">撤回单项授权</span><span class="ds">先说明：哪些读取停止、哪些派生结果失效、数据何时删除</span></div>
+          <div class="blk-row"><span class="no">·</span><span class="nm">同步状态</span><span class="ds">区分同步中/成功/延迟/失败；用户可主动同步</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">02</span>导出 / 删除 / 注销</h3>
+        <div class="flow">
+          <div class="fnode">导出<small>选范围 → 生成 → 安全分享</small></div><div class="farr">·</div>
+          <div class="fnode warn">删数据<small>选范围 → 影响说明 → 二次确认 → 进度 → 证据</small></div><div class="farr">·</div>
+          <div class="fnode warn">注销<small>影响说明 → 二次确认 → 撤会话/同步/实验/ClawBot → 证据</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="n">03</span>微信 ClawBot 连接（六态）</h3>
+        <div class="flow">
+          <div class="fnode">off</div><div class="farr">→</div>
+          <div class="fnode">disclosure<small>提醒类型/排除内容/静默时段</small></div><div class="farr">→</div>
+          <div class="fnode">binding_pending<small>官方绑定步骤可取消</small></div><div class="farr">→</div>
+          <div class="fnode hot">connected<small>偏好配置 · 发送记录</small></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-3);margin-top:10px">只发送用户明确选择的待办摘要；不发原始健康数值、诊断、自由文本。无官方通道时只显示未连接或 dry-run，不伪称已发送。</p>
+      </div>
+      <div class="card">
+        <h3><span class="n">04</span>Demo 差距</h3>
+        <table>
+          <tr><td><span class="tag half">部分</span></td><td>页面骨架已有；缺授权明细与 purpose 展示</td></tr>
+          <tr><td><span class="tag gap">未实现</span></td><td>ClawBot 六态连接流；导出/删除的证据回执</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S8 注册登录 ═══════════ -->
+<section id="s8">
+  <div class="kicker">S8 · 注册登录（今晚新增议题）</div>
+  <h2>微信登录为主，Apple 登录兜底合规，邮箱殿后</h2>
+  <p class="sub">Chris 建议：注册用微信。微信登录后天然衔接 ClawBot 待办提醒（发微信提醒今日 Mission）。但 iOS 审核有硬约束：提供第三方登录的 App 通常须同时提供 Sign in with Apple（Guideline 4.8）。</p>
+
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <h3>方案 A · 微信优先（建议采纳）</h3>
+      <div class="flow" style="flex-direction:column;align-items:stretch">
+        <div class="fnode hot">微信一键登录<small>App 拉起微信授权 → 手机号可选补充</small></div>
+        <div class="farr" style="transform:rotate(90deg);align-self:center">→</div>
+        <div class="fnode">自动创建账号 + 微信 OpenID 绑定<small>unionid 留扩展（公众号/小程序触达）</small></div>
+        <div class="farr" style="transform:rotate(90deg);align-self:center">→</div>
+        <div class="fnode hot">进入 Onboarding<small>ClawBot 在「我的」里可一键升级绑定（已持有微信身份，绑定成本低）</small></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-2);margin-top:10px">优势：转化路径最短、ClawBot 提醒闭环天然成立、目标用户（健康 App 用户）微信渗透率≈100%。</p>
+    </div>
+    <div class="card">
+      <h3>合规与兜底</h3>
+      <div class="blk-list">
+        <div class="blk-row"><span class="no">1</span><span class="nm">Sign in with Apple</span><span class="ds">与微信并列展示（审核 4.8 要求），隐私型用户走这条路</span></div>
+        <div class="blk-row"><span class="no">2</span><span class="nm">邮箱注册</span><span class="ds">殿后入口（折叠），服务海外版 InsyHealth 式扩展</span></div>
+        <div class="blk-row"><span class="no">3</span><span class="nm">会话恢复</span><span class="ds">微信静默续期；Apple/邮箱走系统级恢复</span></div>
+        <div class="blk-row"><span class="no">4</span><span class="nm">注销</span><span class="ds">注销账号必须同时解绑微信 OpenID 并删除云端数据（审核 + 信任双要求）</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>登录 → ClawBot 提醒闭环（产品差异点）</h3>
+    <div class="flow">
+      <div class="fnode hot">微信登录</div><div class="farr">→</div>
+      <div class="fnode">Onboarding 完成</div><div class="farr">→</div>
+      <div class="fnode">「我的」开启 ClawBot<small>disclosure：只发待办摘要</small></div><div class="farr">→</div>
+      <div class="fnode hot">微信收到今日 Mission 提醒<small>点回 App 完成 → 数据进实验循环</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ S9 对标 ═══════════ -->
+<section id="s9">
+  <div class="kicker">S9 · 对标：读手表 Insight</div>
+  <h2>同赛道验证了需求，我们的差异在"实验制"</h2>
+  <p class="sub">读手表 Insight（insyhealth.com，App Store 4.6 分 200+ 评分）验证了「Apple Watch 数据 AI 解读」的需求真实存在。四模块对照（升级版：完整产品拆解已按 EnglishFlow 框架重做，见 <a href="insight-teardown.html" style="color:var(--accent);font-weight:700">读手表 Insight · 产品拆解</a>）：</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <table>
+      <tr><th style="width:110px">模块</th><th>读手表 Insight 的做法</th><th>FitClew 的做法与差异</th></tr>
+      <tr>
+        <td><b>注册授权</b></td>
+        <td>Apple Health 系统授权为主；官网 FAQ 强调"本地分析、数据是否上传"的隐私问答；登录方式官网未明示</td>
+        <td>微信登录优先（S8）＋ 授权前强制"数据用途说明"（O3）＋ 授权四分支状态机。<span class="tag ok">更重</span>：把授权做成产品能力而非系统弹窗</td>
+      </tr>
+      <tr>
+        <td><b>数据采集</b></td>
+        <td>HealthKit 读睡眠/心率/HRV/运动/身体成分；Apple Watch 表盘复杂功能（抬腕看电量+压力+恢复）</td>
+        <td>同一数据源；首发不做表盘（排期内）。<span class="tag half">可借鉴</span>：表盘是它最聪明的留存抓手，V1.1 可评估</td>
+      </tr>
+      <tr>
+        <td><b>数据分析</b></td>
+        <td>四维度：身体年龄评估 / 睡眠恢复（阶段占比+趋势+异常提示）/ 身体电量 0–100 / HRV 压力曲线</td>
+        <td>不直接给分数结论；以实验制观察（假设→授权→验证）。<span class="tag ok">根本差异</span>：它给答案，我们给验证过程；"身体年龄"锚点指标值得借鉴为 Journey 阶段目标</td>
+      </tr>
+      <tr>
+        <td><b>数据洞察</b></td>
+        <td>月度健康画像（30 天节律报告）+ 规律识别（工作日 vs 周末）+ AI 对话式解读</td>
+        <td>Journey 页 30/60/90 趋势 + 里程碑 + 实验结果归档。<span class="tag half">可借鉴</span>：月度画像的报告形态；AI 对话解读在首发排除清单外可排 V1.1</td>
+      </tr>
+      <tr>
+        <td><b>商业化</b></td>
+        <td>免费（当日数据）/ Pro（趋势+月度分析）/ Pro Max（个性化方案+预测）；健康币体系；小红书矩阵招募冷启动</td>
+        <td>付费墙未定（今晚议题 Q6）。它的三级分层（当日免费/趋势收费/方案更贵）是健康类验证过的结构</td>
+      </tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>它的增长打法（对 Build in Public 的参考）</h3>
+    <p style="font-size:13.5px;color:var(--ink-2)">小红书账号矩阵 30+ 篇招募帖（"急招刚买 S11 的用户""找 iWatch 戴满 3 年的人来挑错"），把冷启动做成了连续剧；"身体年龄 Agent 公测"作为事件节点。FitClew 的 8/24 首篇可以直接借"招募共创"叙事，而不是纯产品介绍。</p>
+  </div>
+</section>
+
+<!-- ═══════════ S10 待决策 ═══════════ -->
+<section id="s10">
+  <div class="kicker">S10 · 今晚逐项对齐</div>
+  <h2>待决策清单：10 个问题定边界</h2>
+  <p class="sub">按优先级排序，每条都直接改变 Demo 下一版的范围。</p>
+  <div class="card">
+    <div class="q"><span class="qn">Q1</span><div><div class="qt">注册登录走方案 A（微信优先 + Apple 兜底）吗？</div><div class="qd">定了就补 Demo 的登录页与 Onboarding 前置流程（当前 Demo 直接进主页）。</div></div></div>
+    <div class="q"><span class="qn">Q2</span><div><div class="qt">Today 四态今晚先做哪个？</div><div class="qd">建议 baseline_building（新用户前 7 天都会处在这个态，比 ready 更早被看到）。</div></div></div>
+    <div class="q"><span class="qn">Q3</span><div><div class="qt">Mission 的"调轻"替代方案给哪 2–3 个？</div><div class="qd">需要按真实 Mission 类型定义规则（如"30 分钟力量"→"15 分钟"或"改约明天"）。</div></div></div>
+    <div class="q"><span class="qn">Q4</span><div><div class="qt">实验授权 Sheet 的四要素展示顺序与文案口径</div><div class="qd">这是产品灵魂页，建议逐字过一遍。</div></div></div>
+    <div class="q"><span class="qn">Q5</span><div><div class="qt">记录页五类入口的信息架构</div><div class="qd">五类平铺还是按"当下记录 / 复盘记录"分组？</div></div></div>
+    <div class="q"><span class="qn">Q6</span><div><div class="qt">付费墙结构（对标它的免费/Pro/Pro Max）</div><div class="qd">建议先定"什么免费"：当日 Mission + Body Check 免费，趋势与实验结果收费。</div></div></div>
+    <div class="q"><span class="qn">Q7</span><div><div class="qt">ClawBot 提醒的内容边界确认</div><div class="qd">规格是"仅待办摘要"——要不要加"实验结果通知"？涉及隐私口径。</div></div></div>
+    <div class="q"><span class="qn">Q8</span><div><div class="qt">"身体年龄"要不要作为 Journey 锚点指标</div><div class="qd">对标产品用它做了公测事件，传播性强；但医疗边界文案要跟。</div></div></div>
+    <div class="q"><span class="qn">Q9</span><div><div class="qt">表盘复杂功能排不排进 V1.1</div><div class="qd">它最聪明的留存抓手，但需要 watchOS 开发资源。</div></div></div>
+    <div class="q"><span class="qn">Q10</span><div><div class="qt">Demo 下一版的验收形态</div><div class="qd">继续 Web Demo 补状态，还是直接 SwiftUI 原型接上？（关联 task #27）</div></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  FitClew 功能说明 · 评审版 v1 · 2026-08-22 晚 ｜ 依据：《正式版逐屏交互规格》（Owner review draft）· V3 数据模型 · 读手表 Insight 官网与 App Store 公开信息 · Demo v3 实测截图 ｜ 设计 token 源：DESIGN.md
+</footer>
+
+<script>
+  // 交互三件套：scrollIntoView + 入场动画 + 导航激活态即时切换
+  const links = document.querySelectorAll('#navLinks a');
+  const sections = [...document.querySelectorAll('main section')];
+  function activate(id){
+    links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+id));
+  }
+  links.forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      const t=document.querySelector(a.getAttribute('href'));
+      t.scrollIntoView({behavior:'smooth',block:'start'});
+      history.replaceState(null,'',a.getAttribute('href'));
+      activate(a.getAttribute('href').slice(1));
+    });
+  });
+  const io=new IntersectionObserver(es=>{
+    es.forEach(en=>{if(en.isIntersecting) activate(en.target.id);});
+  },{rootMargin:'-30% 0px -60% 0px'});
+  sections.forEach(s=>io.observe(s));
+</script>
+</body>
+</html>

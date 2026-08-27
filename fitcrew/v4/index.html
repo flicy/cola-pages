@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>FitCrew v4 · 评审页面入口</title>
+<style>
+:root{
+  --bg:#F7F8F0; --card:#FFFFFF; --ink:#1F3A2D; --ink-2:#48624F; --ink-3:#8B9C8C;
+  --line:#E3EADC; --accent:#2FB673;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Source Han Sans SC","Microsoft YaHei",ui-sans-serif,system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100dvh}
+.wrap{max-width:720px;margin:0 auto;padding:88px 24px 96px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(30px,6vw,40px);line-height:1.25;letter-spacing:-.01em;margin:14px 0 12px;font-weight:700}
+.lede{font-size:15.5px;color:var(--ink-2);max-width:52ch}
+.list{margin-top:44px;display:grid;gap:12px}
+a.item{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;text-decoration:none;color:inherit;transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s}
+a.item:hover{transform:translateY(-2px);border-color:#CFE0CC;box-shadow:0 12px 30px -18px rgba(31,58,45,.28)}
+a.item:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.num{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.1em}
+.name{font-size:19px;font-weight:700;margin:5px 0 6px}
+.desc{font-size:14px;color:var(--ink-2)}
+.meta{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){a.item{transition:none}a.item:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">FitCrew · BodyOS</p>
+  <h1>v4 评审页面入口</h1>
+  <p class="lede">三套页面共用同一份视觉 Token 与功能口径：iPhone 原生形态的 iOS 原型、深色控制台的 Web Dashboard，以及逐条对照实现状态的功能说明评审版。</p>
+
+  <div class="list">
+    <a class="item" href="./ios/">
+      <p class="num">01 / iOS</p>
+      <p class="name">iOS 端原型（iPhone 形态）</p>
+      <p class="desc">五屏闭环：今日 · 记录 · 实验 · 旅程 · 我的。按 390×844 的移动端栅格排版，桌面打开时居中显示手机画布。</p>
+      <p class="meta">fitcrew/v4/ios/</p>
+    </a>
+
+    <a class="item" href="./dashboard/">
+      <p class="num">02 / Web</p>
+      <p class="name">Web 端 Dashboard · 90 Day Journey</p>
+      <p class="desc">深色控制台的完整信息架构：当前状态、血糖与实验对照、洞察队列、旅程档案与记忆层，含锚点直达。</p>
+      <p class="meta">fitcrew/v4/dashboard/</p>
+    </a>
+
+    <a class="item" href="./review/">
+      <p class="num">03 / Review</p>
+      <p class="name">产品功能说明 · 评审版</p>
+      <p class="desc">十个章节逐屏拆解，每屏标注「已实现 / 部分实现 / 未实现」，附截图与读手表 Insight 对标拆解。</p>
+      <p class="meta">fitcrew/v4/review/</p>
+    </a>
+  </div>
+
+  <footer>内部评审用，已设置 noindex；请勿转发到公开群。更新于 2026-08-27。</footer>
+</div>
+</body>
+</html>
