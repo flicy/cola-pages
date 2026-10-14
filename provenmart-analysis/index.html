@@ -163,6 +163,32 @@ h1{font-family:var(--serif);font-size:var(--fs-h1);font-weight:600;letter-spacin
 .tag.c{border-color:var(--copper-d);color:var(--copper-d)}
 .tag.ok{border-color:var(--ok);color:var(--ok)}
 .tag.obs{border-style:dashed;color:var(--muted)}
+.tag.pend{border-style:dashed;color:var(--off)}
+/* 来源标注：三类来源全走灰阶，不新增强调色；客户回传未授权＝虚线待授权 */
+.src{display:inline-block;font-family:var(--sans);font-size:var(--fs-axis);line-height:var(--lh-axis);border:1px solid var(--line-2);border-radius:3px;padding:0 6px;color:var(--brown);white-space:nowrap;letter-spacing:.02em}
+.src.pub{border-style:solid;color:var(--meta)}
+.src.plat{border-style:solid;color:var(--sub)}
+.src.cust{border-style:dashed}
+.src.pend{border-style:dashed;color:var(--off)}
+.cb-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.cb-src{display:flex;align-items:center;gap:5px;font-size:var(--fs-axis);color:var(--muted);white-space:nowrap}
+.srcbanner{display:flex;align-items:center;gap:10px;border:1px solid var(--card-line);border-left:3px solid var(--axis);border-radius:4px;background:var(--card);padding:10px 14px;margin-top:16px;font-size:var(--fs-axis);color:var(--brown);line-height:var(--lh-note)}
+.srcbanner b{color:var(--ink);font-weight:600}
+.revlist{display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:var(--fs-axis);color:var(--brown);line-height:var(--lh-note)}
+.revlist.open{display:block}
+.revlist ul{margin:6px 0 0 16px}
+.revlist li{margin-top:3px}
+.elcmp{width:100%;border-collapse:collapse;font-size:var(--fs-axis)}
+.elcmp th{text-align:left;color:var(--meta);font-weight:500;letter-spacing:.04em;padding:6px 0;border-bottom:1px solid var(--line)}
+.elcmp td{padding:6px 0;border-bottom:1px solid var(--row);color:var(--ink);line-height:var(--lh-label)}
+.elcmp td:last-child,.elcmp th:last-child{text-align:right;color:var(--brown)}
+.elcmp td:nth-child(2),.elcmp th:nth-child(2){color:var(--brown)}
+.pendcell{color:var(--off);font-family:var(--sans);white-space:nowrap}
+.evid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:11px;border-top:1px solid var(--line);padding-top:9px}
+.evid .e .k{display:block;font-size:var(--fs-axis);color:var(--muted);letter-spacing:.06em;margin-bottom:2px}
+.evid .e .v{font-size:var(--fs-axis);color:var(--ink);line-height:var(--lh-note)}
+.kpi-rail .r .val .src{margin-left:5px}
+.cb-head{align-items:center}
 
 .missstrip{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:3px;padding:9px 12px;margin-top:10px}
 .missstrip .mtag{font-size:var(--fs-axis);color:var(--brown);border:1px solid var(--line-2);border-radius:3px;padding:1px 7px;flex:0 0 auto}
@@ -532,6 +558,53 @@ function miniBars(cfg){
   return s.join('')+'</svg>';
 }
 
+/* 转化漏斗（单色阶；未接通段以斜纹呈现，不填 0） */
+function funnel(cfg){
+  const w=cfg.w,rows=cfg.rows,labelW=124,barX=labelW,barMax=w-barX-86,rh=46,top=14,bh=26;
+  const max=Math.max(...rows.filter(r=>!r.pending).map(r=>r.value));
+  const h=top+rh*rows.length-rh+bh+16;
+  const grads=[COP,"#6390B5","#93B0CC","#C2D4E4","#EAF0F6"];
+  let s=['<svg class="chart" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="转化漏斗五段">'];
+  s.push('<defs><pattern id="fhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'+
+    '<rect width="6" height="6" fill="#F3F4F6"/><line x1="0" y1="0" x2="0" y2="6" stroke="#C9CDD3" stroke-width="2"/></pattern></defs>');
+  rows.forEach((r,i)=>{
+    const cy=top+i*rh;
+    s.push('<text class="ax2" x="0" y="'+fm(cy+bh*0.62)+'" fill="'+INK+'">'+esc(r.label)+'</text>');
+    s.push('<text class="ax" x="0" y="'+fm(cy+bh*0.62+15)+'">第 '+(i+1)+' 段</text>');
+    if(r.pending){
+      s.push('<rect x="'+fm(barX)+'" y="'+fm(cy)+'" width="'+fm(barMax)+'" height="'+bh+'" rx="2" fill="url(#fhatch)" stroke="'+LINE2+'" stroke-width="1"/>');
+      s.push('<text class="vl" x="'+fm(barX+barMax+10)+'" y="'+fm(cy+bh*0.62)+'" fill="#9CA3AF">待授权</text>');
+    }else{
+      const bw=Math.max(6,barMax*r.value/max);
+      s.push('<rect x="'+fm(barX)+'" y="'+fm(cy)+'" width="'+fm(bw)+'" height="'+bh+'" rx="2" fill="'+grads[i]+'"/>');
+      s.push('<text class="vl" x="'+fm(barX+bw+10)+'" y="'+fm(cy+bh*0.62)+'">'+esc(r.disp)+'</text>');
+    }
+  });
+  s.push('</svg>');
+  CHART[cfg.id]={kind:"funnel",rows:rows,barX:barX,barMax:barMax,max:max,rh:rh,top:top,bh:bh};
+  return s.join('');
+}
+
+/* 双系列分组横条（要素分布 / 我的 vs 赛道） */
+function cmpbars(cfg){
+  const w=cfg.w,rows=cfg.rows,labelW=cfg.labelW||150,barX=labelW,barMax=w-barX-72,rh=44,top=14,bh=12,gap=5;
+  const max=cfg.max||Math.max(...rows.map(r=>Math.max(r.a,r.b)));
+  const h=top+rh*rows.length-rh+bh*2+gap+10;
+  let s=['<svg class="chart" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(cfg.aria||'')+'">'];
+  rows.forEach((r,i)=>{
+    const cy=top+i*rh;
+    s.push('<text class="ax2" x="0" y="'+fm(cy+bh+2)+'" fill="'+INK+'">'+esc(r.label)+'</text>');
+    const aw=Math.max(2,barMax*r.a/max),bw=Math.max(2,barMax*r.b/max);
+    s.push('<rect x="'+fm(barX)+'" y="'+fm(cy)+'" width="'+fm(aw)+'" height="'+bh+'" rx="2" fill="'+COP+'"/>');
+    s.push('<text class="vl" x="'+fm(barX+aw+8)+'" y="'+fm(cy+bh-1)+'">'+esc(r.aDisp)+'</text>');
+    s.push('<rect x="'+fm(barX)+'" y="'+fm(cy+bh+gap)+'" width="'+fm(bw)+'" height="'+bh+'" rx="2" fill="#93B0CC"/>');
+    s.push('<text class="vl" x="'+fm(barX+bw+8)+'" y="'+fm(cy+bh*2+gap-1)+'" fill="#6B7280">'+esc(r.bDisp)+'</text>');
+  });
+  s.push('</svg>');
+  CHART[cfg.id]={kind:"cmp",rows:rows,barX:barX,barMax:barMax,max:max,rh:rh,top:top,bh:bh,gap:gap,aName:cfg.aName||"",bName:cfg.bName||""};
+  return s.join('');
+}
+
 /* =========================================================================
    2. 数据（示意值 · 四平台各自一套，全部内联，便于替换）
    ========================================================================= */
@@ -823,24 +896,147 @@ const P={
   }
 };
 
+/* =========================================================================
+   2b. 内容要素层 / 转化链 / 热门与竞品 / 结论证据（全部内联示意值）
+   ========================================================================= */
+/* 八个要素编码：按版本 id 索引（id 全局唯一） */
+const ELEM={
+  "v-0412":{open:"结果先行",struct:"单点",demo:"真人出镜",cover:"数字＋界面截图",dur:"30 秒内",cta:"结尾 · 链接",lang:"字幕 · 英语",density:"6.2 点/分"},
+  "v-0388":{open:"结果先行",struct:"清单",demo:"屏幕录制",cover:"数字",dur:"30 秒内",cta:"评论区关键词",lang:"字幕 · 英语",density:"5.4 点/分"},
+  "v-0401":{open:"提问",struct:"流程",demo:"口播＋画面",cover:"界面截图",dur:"30–60 秒",cta:"中段 · 链接",lang:"字幕 · 英语",density:"4.8 点/分"},
+  "v-0377":{open:"提问",struct:"复盘",demo:"真人出镜",cover:"数字",dur:"30–60 秒",cta:"结尾 · 主页",lang:"双语",density:"4.1 点/分"},
+  "v-1208":{open:"结果先行",struct:"单点",demo:"真人＋AI",cover:"数字＋界面截图",dur:"30 秒内",cta:"结尾 · 链接",lang:"字幕 · 英语",density:"6.6 点/分"},
+  "v-1150":{open:"结果先行",struct:"复盘",demo:"真人出镜",cover:"数字",dur:"30 秒内",cta:"评论区关键词",lang:"字幕 · 英语",density:"5.1 点/分"},
+  "v-1211":{open:"提问",struct:"清单",demo:"屏幕录制",cover:"界面截图",dur:"30 秒内",cta:"中段 · 链接",lang:"字幕 · 英语",density:"4.7 点/分"},
+  "v-1096":{open:"操作演示",struct:"流程",demo:"真人出镜",cover:"数字",dur:"30 秒内",cta:"结尾 · 主页",lang:"双语",density:"4.2 点/分"},
+  "v-0731":{open:"结果先行",struct:"单点",demo:"屏幕录制",cover:"数字＋界面截图",dur:"1–3 分钟",cta:"结尾 · 链接",lang:"字幕 · 英语",density:"5.8 点/分"},
+  "v-0702":{open:"提问",struct:"清单",demo:"屏幕录制",cover:"界面截图",dur:"1–3 分钟",cta:"中段 · 链接",lang:"字幕 · 英语",density:"5.2 点/分"},
+  "v-0688":{open:"结果先行",struct:"复盘",demo:"真人出镜",cover:"数字",dur:"1–3 分钟",cta:"结尾 · 主页",lang:"双语",density:"4.4 点/分"},
+  "v-0654":{open:"操作演示",struct:"流程",demo:"口播＋画面",cover:"界面截图",dur:"1–3 分钟",cta:"评论区关键词",lang:"字幕 · 英语",density:"3.9 点/分"}
+};
+/* 同批中位数（分类要素取同批众数与其占比） */
+const ELMED={
+  tiktok:{open:"操作演示（41%）",struct:"单点（38%）",demo:"口播＋画面（35%）",cover:"数字（47%）",dur:"30–60 秒（52%）",cta:"结尾 · 链接（61%）",lang:"字幕 · 英语（70%）",density:"4.6 点/分"},
+  instagram:{open:"结果先行（44%）",struct:"单点（40%）",demo:"真人＋AI（33%）",cover:"数字（49%）",dur:"30 秒内（58%）",cta:"结尾 · 链接（57%）",lang:"字幕 · 英语（66%）",density:"4.9 点/分"},
+  youtube:{open:"操作演示（39%）",struct:"清单（37%）",demo:"屏幕录制（42%）",cover:"界面截图（45%）",dur:"1–3 分钟（55%）",cta:"中段 · 链接（48%）",lang:"字幕 · 英语（64%）",density:"4.3 点/分"}
+};
+/* 转化链（来源：客户回传） */
+const CONV={
+  tiktok:{lead:"漏斗五段：<b>可追踪点击 48,720 → 进站 35,600 → 注册 7,584</b>；激活与询盘整段未接通，显示待授权。",
+    kpi:{ns:["北极星 · 进站 → 注册率","TIER 1","21.3%","环比上周期 <span class=\"up\">+1.2pt</span>",[17,18,19,20,20.6,21.3]],
+      i2:["可追踪点击","48,720","平台侧＋发布侧",[38,41,44,46,47.5,48.72]],
+      i3:["注册 / 试用","7,584","客户回传 · 已接通",[6.4,6.7,7.0,7.2,7.4,7.584]],
+      i4:["激活 / 询盘","待授权","客户回传 · 未接通",null],
+      rail:[["进站","35,600","平台侧"],["进站 → 注册","21.3%"],["单位结果成本","待授权","客户回传"],["接入阶段","3 / 5 段"]]},
+    funnel:[{label:"可追踪点击",value:48720,disp:"48,720"},{label:"进站",value:35600,disp:"35,600"},{label:"注册 / 试用",value:7584,disp:"7,584"},{label:"激活",pending:true},{label:"询盘",pending:true}],
+    dims:{
+      content:{title:"按内容拆解 · 注册数",rows:[{label:"用户视角",value:6520,disp:"6,520 · 86%"},{label:"真人出镜",value:502,disp:"502 · 6.6%"},{label:"产品介绍",value:562,disp:"562 · 7.4%"}]},
+      account:{title:"按账号拆解 · 注册数",rows:[{label:"千粉号",value:3120,disp:"3,120 · 41%"},{label:"垂直号",value:2980,disp:"2,980 · 39%"},{label:"白号",value:1484,disp:"1,484 · 20%"}]},
+      platform:{title:"按平台拆解 · 注册数",rows:[{label:"TikTok",value:7584,disp:"7,584 · 70%"},{label:"YouTube",value:1768,disp:"1,768 · 16%"},{label:"Instagram",value:1458,disp:"1,458 · 14%"}]},
+      market:{title:"按市场拆解 · 注册数",rows:[{label:"北美",value:4120,disp:"4,120 · 54%"},{label:"欧洲",value:1980,disp:"1,980 · 26%"},{label:"东南亚",value:1484,disp:"1,484 · 20%"}]}},
+    rows:[{id:"v-0412",title:"用它 30 秒搭出周报",reg:"402",regN:402,cost:"¥ 18.6"},{id:"v-0388",title:"三个提示词写完一份竞品表",reg:"338",regN:338,cost:"¥ 21.4"},{id:"v-0401",title:"用同一份数据做三件事",reg:"196",regN:196,cost:"¥ 32.8"},{id:"v-0377",title:"它真的能替我做调研吗",reg:"171",regN:171,cost:"¥ 38.2"}],
+    fields:["站内事件表（访客 / 会话标识、来源参数、事件类型、时间戳）","来源参数规则（UTM 或短链命名）","注册、激活、询盘的定义与去重规则","归因窗口（点击后 7 天或 28 天，二选一并写定）"]},
+  instagram:{lead:"漏斗五段：<b>可追踪点击 8,610 → 进站 6,400 → 注册 1,458</b>；激活与询盘整段未接通，显示待授权。",
+    kpi:{ns:["北极星 · 进站 → 注册率","TIER 1","22.8%","环比上周期 <span class=\"up\">+1.5pt</span>",[18,19,20,21,22,22.8]],
+      i2:["可追踪点击","8,610","平台侧＋发布侧",[6.1,6.6,7.2,7.6,8.2,8.61]],
+      i3:["注册 / 试用","1,458","客户回传 · 已接通",[1.1,1.16,1.24,1.32,1.4,1.458]],
+      i4:["激活 / 询盘","待授权","客户回传 · 未接通",null],
+      rail:[["进站","6,400","平台侧"],["进站 → 注册","22.8%"],["单位结果成本","待授权","客户回传"],["接入阶段","3 / 5 段"]]},
+    funnel:[{label:"可追踪点击",value:8610,disp:"8,610"},{label:"进站",value:6400,disp:"6,400"},{label:"注册 / 试用",value:1458,disp:"1,458"},{label:"激活",pending:true},{label:"询盘",pending:true}],
+    dims:{
+      content:{title:"按内容拆解 · 注册数",rows:[{label:"用户视角",value:1240,disp:"1,240 · 85%"},{label:"真人出镜",value:104,disp:"104 · 7.1%"},{label:"产品介绍",value:114,disp:"114 · 7.9%"}]},
+      account:{title:"按账号拆解 · 注册数",rows:[{label:"垂直号",value:560,disp:"560 · 38%"},{label:"千粉号",value:520,disp:"520 · 36%"},{label:"白号",value:378,disp:"378 · 26%"}]},
+      platform:{title:"按平台拆解 · 注册数",rows:[{label:"TikTok",value:7584,disp:"7,584 · 70%"},{label:"YouTube",value:1768,disp:"1,768 · 16%"},{label:"Instagram",value:1458,disp:"1,458 · 14%"}]},
+      market:{title:"按市场拆解 · 注册数",rows:[{label:"北美",value:720,disp:"720 · 49%"},{label:"欧洲",value:438,disp:"438 · 30%"},{label:"东南亚",value:300,disp:"300 · 21%"}]}},
+    rows:[{id:"v-1208",title:"一张图讲清楚剂量记录",reg:"158",regN:158,cost:"¥ 24.1"},{id:"v-1150",title:"打卡 30 天，体重发生了什么",reg:"138",regN:138,cost:"¥ 27.6"},{id:"v-1211",title:"三个提醒别再漏掉注射",reg:"92",regN:92,cost:"¥ 36.4"},{id:"v-1096",title:"我把一周的药和水记在一页",reg:"61",regN:61,cost:"¥ 41.0"}],
+    fields:["站内事件表（访客 / 会话标识、来源参数、事件类型、时间戳）","来源参数规则（UTM 或短链命名）","注册、激活、询盘的定义与去重规则","归因窗口（点击后 7 天或 28 天，二选一并写定）"]},
+  youtube:{lead:"漏斗五段：<b>可追踪点击 9,540 → 进站 7,900 → 注册 1,768</b>；激活与询盘整段未接通，显示待授权。",
+    kpi:{ns:["北极星 · 进站 → 注册率","TIER 1","22.4%","环比上周期 <span class=\"up\">+0.9pt</span>",[18,19,20.5,21.4,22,22.4]],
+      i2:["可追踪点击","9,540","平台侧＋发布侧",[7.2,7.8,8.3,8.7,9.1,9.54]],
+      i3:["注册 / 试用","1,768","客户回传 · 已接通",[1.4,1.5,1.6,1.66,1.72,1.768]],
+      i4:["激活 / 询盘","待授权","客户回传 · 未接通",null],
+      rail:[["进站","7,900","平台侧"],["进站 → 注册","22.4%"],["单位结果成本","待授权","客户回传"],["接入阶段","3 / 5 段"]]},
+    funnel:[{label:"可追踪点击",value:9540,disp:"9,540"},{label:"进站",value:7900,disp:"7,900"},{label:"注册 / 试用",value:1768,disp:"1,768"},{label:"激活",pending:true},{label:"询盘",pending:true}],
+    dims:{
+      content:{title:"按内容拆解 · 注册数",rows:[{label:"用户视角",value:1410,disp:"1,410 · 80%"},{label:"真人出镜",value:172,disp:"172 · 9.7%"},{label:"产品介绍",value:186,disp:"186 · 10.5%"}]},
+      account:{title:"按账号拆解 · 注册数",rows:[{label:"垂直号",value:640,disp:"640 · 36%"},{label:"千粉号",value:620,disp:"620 · 35%"},{label:"白号",value:508,disp:"508 · 29%"}]},
+      platform:{title:"按平台拆解 · 注册数",rows:[{label:"TikTok",value:7584,disp:"7,584 · 70%"},{label:"YouTube",value:1768,disp:"1,768 · 16%"},{label:"Instagram",value:1458,disp:"1,458 · 14%"}]},
+      market:{title:"按市场拆解 · 注册数",rows:[{label:"北美",value:980,disp:"980 · 55%"},{label:"欧洲",value:520,disp:"520 · 29%"},{label:"东南亚",value:268,disp:"268 · 15%"}]}},
+    rows:[{id:"v-0731",title:"把一周的数据压成一屏",reg:"268",regN:268,cost:"¥ 20.2"},{id:"v-0702",title:"从 0 到 1 搭好一份周报",reg:"214",regN:214,cost:"¥ 25.8"},{id:"v-0688",title:"记录这件事，工具能省多少事",reg:"158",regN:158,cost:"¥ 31.4"},{id:"v-0654",title:"一屏看完剂量与体重趋势",reg:"92",regN:92,cost:"¥ 44.6"}],
+    fields:["站内事件表（访客 / 会话标识、来源参数、事件类型、时间戳）","来源参数规则（UTM 或短链命名）","注册、激活、询盘的定义与去重规则","归因窗口（点击后 7 天或 28 天，二选一并写定）"]}
+};
+/* 热门与竞品（来源：平台侧公开数据，不依赖客户回传） */
+const HOT={
+  tiktok:{lead:"赛道公开热门内容里，<b>「结果先行」开头占 54%</b>，头部 3 秒留存中位 58%；我的同批 61%，高 3 个点。",
+    kpi:{ns:["北极星 · 开头 3 秒留存（我的 / 赛道）","TIER 1","61%","赛道基准 58% · <span class=\"up\">+3pt</span>",[55,56,57,58,59.5,61]],
+      i2:["榜单样本","1,240","近 30 日 · 平台侧公开",[0.9,1.0,1.05,1.1,1.18,1.24]],
+      i3:["头部「结果先行」占比","54%","全赛道基准 38%",[44,46,48,50,52,54]],
+      i4:["我的 vs 赛道","+3pt","开头 3 秒留存",[1,1.5,2,2.4,2.8,3]],
+      rail:[["采集窗口","近 30 日"],["样本","1,240"],["来源","平台侧公开"],["客户回传依赖","无"]]},
+    dist:[{label:"结果先行",head:54,all:38,headDisp:"54%",allDisp:"38%"},{label:"操作演示",head:21,all:27,headDisp:"21%",allDisp:"27%"},{label:"提问",head:14,all:18,headDisp:"14%",allDisp:"18%"},{label:"对比",head:7,all:11,headDisp:"7%",allDisp:"11%"},{label:"故事",head:4,all:6,headDisp:"4%",allDisp:"6%"}],
+    cmp:[{label:"开头 3 秒留存",mine:"61%",track:"58%",gap:"+3pt"},{label:"互动率",mine:"5.6%",track:"4.9%",gap:"+0.7pt"},{label:"进站率",mine:"1.30%",track:"1.05%",gap:"+0.25pt"},{label:"信息密度",mine:"6.2",track:"4.6",gap:"+1.6"},{label:"30 秒内占比",mine:"52%",track:"44%",gap:"+8pt"}],
+    board:[{rank:1,title:"30 秒看懂这份财报",acct:"@fin_scope",play:"1.82M",open:"结果先行",dur:"30 秒内",collect:"2026-10-12"},{rank:2,title:"我用它把周报自动化了",acct:"@workless",play:"1.24M",open:"结果先行",dur:"30–60 秒",collect:"2026-10-11"},{rank:3,title:"三个提示词搞定竞品表",acct:"@growthlab",play:"986K",open:"清单开场",dur:"30 秒内",collect:"2026-10-12"},{rank:4,title:"实测：AI 能不能替我做调研",acct:"@ai_probe",play:"742K",open:"提问",dur:"1–3 分钟",collect:"2026-10-10"},{rank:5,title:"把一堆数据压成一屏",acct:"@datapane",play:"615K",open:"操作演示",dur:"30–60 秒",collect:"2026-10-13"},{rank:6,title:"对比了五款工具我留下了它",acct:"@toolfair",play:"508K",open:"对比",dur:"1–3 分钟",collect:"2026-10-09"}],
+    boardNote:"样本 1,240 条 · 采集 2026-10-13 · 来源：平台侧公开数据"},
+  instagram:{lead:"赛道头部「结果先行」占 44%；我的 4:5 画幅同批 3 秒留存 64%，高于赛道 6 个点。",
+    kpi:{ns:["北极星 · 开头 3 秒留存（我的 / 赛道）","TIER 1","64%","赛道基准 58% · <span class=\"up\">+6pt</span>",[58,59,60,61,62.5,64]],
+      i2:["榜单样本","980","近 30 日 · 平台侧公开",[0.7,0.78,0.82,0.86,0.92,0.98]],
+      i3:["头部「结果先行」占比","44%","全赛道基准 32%",[34,36,38,40,42,44]],
+      i4:["我的 vs 赛道","+6pt","开头 3 秒留存",[1,2,3,4,5,6]],
+      rail:[["采集窗口","近 30 日"],["样本","980"],["来源","平台侧公开"],["客户回传依赖","无"]]},
+    dist:[{label:"结果先行",head:44,all:32,headDisp:"44%",allDisp:"32%"},{label:"操作演示",head:24,all:29,headDisp:"24%",allDisp:"29%"},{label:"提问",head:16,all:20,headDisp:"16%",allDisp:"20%"},{label:"对比",head:9,all:12,headDisp:"9%",allDisp:"12%"},{label:"故事",head:7,all:7,headDisp:"7%",allDisp:"7%"}],
+    cmp:[{label:"开头 3 秒留存",mine:"64%",track:"58%",gap:"+6pt"},{label:"互动率",mine:"6.2%",track:"5.1%",gap:"+1.1pt"},{label:"进站率",mine:"1.59%",track:"1.22%",gap:"+0.37pt"},{label:"信息密度",mine:"6.6",track:"4.8",gap:"+1.8"},{label:"30 秒内占比",mine:"66%",track:"55%",gap:"+11pt"}],
+    board:[{rank:1,title:"一张图讲清剂量记录",acct:"@dose_daily",play:"1.36M",open:"结果先行",dur:"30 秒内",collect:"2026-10-12"},{rank:2,title:"我的一周记录长这样",acct:"@week_trace",play:"920K",open:"结果先行",dur:"30 秒内",collect:"2026-10-11"},{rank:3,title:"三个提醒别再漏掉",acct:"@remind_kit",play:"688K",open:"提问",dur:"30 秒内",collect:"2026-10-13"},{rank:4,title:"药、水、体重记在一页",acct:"@onepage",play:"512K",open:"操作演示",dur:"30 秒内",collect:"2026-10-10"},{rank:5,title:"打卡 30 天发生了什么",acct:"@day30",play:"436K",open:"结果先行",dur:"30–60 秒",collect:"2026-10-09"}],
+    boardNote:"样本 980 条 · 采集 2026-10-13 · 来源：平台侧公开数据"},
+  youtube:{lead:"赛道头部「结果先行」占 49%；我的同批 3 秒留存 70%，全平台最高。",
+    kpi:{ns:["北极星 · 开头 3 秒留存（我的 / 赛道）","TIER 1","70%","赛道基准 61% · <span class=\"up\">+9pt</span>",[62,64,66,67,68.5,70]],
+      i2:["榜单样本","860","近 30 日 · 平台侧公开",[0.6,0.68,0.72,0.76,0.82,0.86]],
+      i3:["头部「结果先行」占比","49%","全赛道基准 36%",[39,41,43,45,47,49]],
+      i4:["我的 vs 赛道","+9pt","开头 3 秒留存",[1,3,4,6,7,9]],
+      rail:[["采集窗口","近 30 日"],["样本","860"],["来源","平台侧公开"],["客户回传依赖","无"]]},
+    dist:[{label:"结果先行",head:49,all:36,headDisp:"49%",allDisp:"36%"},{label:"操作演示",head:23,all:28,headDisp:"23%",allDisp:"28%"},{label:"提问",head:13,all:17,headDisp:"13%",allDisp:"17%"},{label:"对比",head:9,all:12,headDisp:"9%",allDisp:"12%"},{label:"故事",head:6,all:7,headDisp:"6%",allDisp:"7%"}],
+    cmp:[{label:"开头 3 秒留存",mine:"70%",track:"61%",gap:"+9pt"},{label:"互动率",mine:"4.2%",track:"3.6%",gap:"+0.6pt"},{label:"进站率",mine:"1.20%",track:"1.02%",gap:"+0.18pt"},{label:"信息密度",mine:"5.8",track:"4.3",gap:"+1.5"},{label:"1 分钟内占比",mine:"38%",track:"31%",gap:"+7pt"}],
+    board:[{rank:1,title:"把一周数据压成一屏",acct:"@data_screen",play:"1.08M",open:"结果先行",dur:"1–3 分钟",collect:"2026-10-12"},{rank:2,title:"从 0 到 1 搭好一份周报",acct:"@report_lab",play:"764K",open:"提问",dur:"1–3 分钟",collect:"2026-10-11"},{rank:3,title:"记录这件事能省多少事",acct:"@time_save",play:"602K",open:"结果先行",dur:"1–3 分钟",collect:"2026-10-13"},{rank:4,title:"一屏看完剂量与体重",acct:"@trend_view",play:"448K",open:"操作演示",dur:"1–3 分钟",collect:"2026-10-10"},{rank:5,title:"长视频怎么做不一定长",acct:"@longform",play:"356K",open:"对比",dur:"3 分钟以上",collect:"2026-10-08"}],
+    boardNote:"样本 860 条 · 采集 2026-10-13 · 来源：平台侧公开数据"}
+};
+/* 结论的五样证据（与 p.rep.findings 逐条对应） */
+const REPSRC={
+  tiktok:[
+    {ev:[["样本数","4,100"],["分母","全批 4,100 条内容版本"],["窗口","发布后 7 日 / 28 日"],["来源","发布侧＋平台侧"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","12 条同规格"],["分母","全批 4,100 条"],["窗口","发布后 7 日 / 28 日"],["来源","平台侧＋转录标注"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","486 条评论"],["分母","该批全部评论"],["窗口","发布后 7 日"],["来源","平台侧公开（评论）"],["采集时间","2026-10-13"]]}],
+  instagram:[
+    {ev:[["样本数","900"],["分母","全批 900 条内容版本"],["窗口","发布后 7 日 / 28 日"],["来源","发布侧＋平台侧"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","8 条同规格"],["分母","全批 900 条"],["窗口","发布后 7 日 / 28 日"],["来源","平台侧＋转录标注"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","312 条评论"],["分母","该批全部评论"],["窗口","发布后 7 日"],["来源","平台侧公开（评论）"],["采集时间","2026-10-13"]]}],
+  youtube:[
+    {ev:[["样本数","500"],["分母","全批 500 条内容版本"],["窗口","发布后 7 日 / 28 日"],["来源","发布侧＋平台侧"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","5 条同规格"],["分母","全批 500 条"],["窗口","发布后 7 日 / 28 日"],["来源","平台侧＋转录标注"],["采集时间","2026-10-13"]]},
+    {ev:[["样本数","168 条评论"],["分母","该批全部评论"],["窗口","发布后 7 日"],["来源","平台侧公开（评论）"],["采集时间","2026-10-13"]]}]
+};
+/* 缺口声明 */
+const GAP={
+  tiktok:{items:["激活与询盘整段未接通：客户尚未回传站内事件，本报告口径止于「可追踪点击 → 注册」。","Instagram 私有洞察 4 / 9 字段未授权：触达与收藏不参与比较。","Facebook 未接入：不出现在任何跨平台合计里。","归因窗口暂按点击后 7 天；28 天窗口待客户确认后重算。"]},
+  instagram:{items:["激活与询盘整段未接通：客户尚未回传站内事件，口径止于「可追踪点击 → 注册」。","Instagram 私有洞察 4 / 9 字段未授权：触达与收藏不参与比较。","字段覆盖率 73.3%：其余 26.7% 的字段待授权，缺口不补数。","归因窗口暂按点击后 7 天；28 天窗口待客户确认后重算。"]},
+  youtube:{items:["激活与询盘整段未接通：客户尚未回传站内事件，口径止于「可追踪点击 → 注册」。","留存曲线待后台逐条导出：样本 500 条，部分条目不足。","字段覆盖率 84.0%：其余 16.0% 的字段待授权，缺口不补数。","归因窗口暂按点击后 7 天；28 天窗口待客户确认后重算。"]}
+};
+
 /* 锁定模块（未开发）— 每个都回答一个问题 */
 const NAVGROUPS=[
   ["看现状",[["overview","平台总览","01",1],["bigboard","单平台大盘","02",0],["accounts","账号与排期","03",1]]],
-  ["看内容",[["content","单条内容","04",1],["categories","内容分类","05",1],["conversion","转化","06",0]]],
-  ["出结论",[["report","报告","07",1],["testlist","下一轮测试单","08",0]]],
-  ["加购与设置",[["hot","热门与竞品","09",0],["creators","达人与账号","10",0],["feedback","用户反馈","11",0],["sources","数据来源与口径","12",0]]]
+  ["看内容",[["content","单条内容","04",1],["categories","内容分类","05",1],["conversion","转化","06",1]]],
+  ["看外部",[["hot","热门与竞品","07",1],["creators","达人与账号","08",0],["feedback","用户反馈","09",0]]],
+  ["出结论与口径",[["report","报告","10",1],["testlist","下一轮测试单","11",0],["sources","数据来源与口径","12",0]]]
 ];
 const LOCKED={
   bigboard:["在这个平台内部，哪几天在涨、涨在哪一类内容上？","按平台拆出日粒度的内容量与进站走势，定位单平台内部的爆点与回落，而不是被跨平台合计平均掉。"],
-  conversion:["进站的人有没有变成注册或询盘？","接客户授权的站内事件，看进站 → 注册 → 询盘的漏斗与流失点，把「点击多」翻译成「有效果」。"],
   testlist:["下一轮具体测哪个变量、复测哪个指标？","把本期结论转成可执行、可复测的测试项，每一项都绑定变量与复测指标，避免测完读不出结论。"],
-  hot:["别人的哪条选题与表达结构值得参考？","按约定平台与主题收集公开内容，比较增长、表达结构与账号（扩套加购）。"],
   creators:["下一批找谁合作更匹配？","按技术主题、语种、市场筛候选账号与达人，给出匹配依据而非粉丝数（扩套加购）。"],
   feedback:["用户卡在哪一步、在问什么？","分析评论与讨论中的使用场景、理解障碍与功能诉求，并逐条回链原文（扩套加购）。"],
   sources:["每个数字从哪来、口径是什么、缺什么？","字段清单、指标定义、缺失与不适用标注，以及本期全部口径声明，一处可查。"]
 };
 const VIEWTITLE={overview:["分析 / 平台总览","平台总览"],accounts:["分析 / 账号与排期","账号与排期"],
   content:["分析 / 单条内容","单条内容"],categories:["分析 / 内容分类","内容分类"],
+  conversion:["分析 / 转化","转化"],hot:["分析 / 热门与竞品","热门与竞品"],
   report:["分析 / 报告与下一轮","报告与下一轮"]};
 
 const dotBase=[[0,0,1,1,2,3,2,2,3,4,3,1],[0,1,1,2,3,4,3,2,3,5,4,2],[0,0,1,2,2,3,2,2,3,4,3,1],
@@ -872,22 +1068,24 @@ function kpiBand(k){
        (x[3]?spark(x[3],86,24):'')+'</div><div class="k-cmp">'+x[2]+'</div></div>';
   });
   h+='</div><div class="kpi-rail">';
-  k.rail.forEach(r=>{const miss=(r[1]==="—");h+='<div class="r"><span class="lab">'+esc(r[0])+
-    '</span><span class="val'+(miss?' miss':'')+'">'+esc(r[1])+'</span></div>';});
+  k.rail.forEach(r=>{const miss=(r[1]==="—"||r[1]==="待授权");h+='<div class="r"><span class="lab">'+esc(r[0])+
+    '</span><span class="val'+(miss?' miss':'')+'">'+esc(r[1])+(r[2]?' <span class="src '+(r[2]==="客户回传"?'cust':'plat')+'">'+esc(r[2])+'</span>':'')+'</span></div>';});
   return h+'</div>';
 }
 function sect(tag,num,title,sub,body){
   return '<section class="sect"><div class="sect-l">'+tag+'<b>'+num+'</b></div>'+
     '<div class="sect-body"><h2>'+esc(title)+'</h2><div class="ssub">'+esc(sub)+'</div>'+body+'</div></section>';
 }
-function cb(title,sub,inner,note){
-  return '<div class="chartbox"><div class="cb-head"><h3>'+esc(title)+'</h3><span class="cb-sub">'+esc(sub)+'</span></div>'+
+function cb(title,sub,inner,note,src){
+  return '<div class="chartbox"><div class="cb-head"><h3>'+esc(title)+'</h3>'+
+    '<div class="cb-meta"><span class="cb-sub">'+esc(sub)+'</span>'+(src?'<span class="cb-src">来源 '+src+'</span>':'')+'</div></div>'+
     inner+(note?'<div class="cb-note">'+note+'</div>':'')+'</div>';
 }
 function footnote(p){
   return '<div class="fi"><span class="fk">口径说明</span>缺失、真实零值与不适用分别显示；跨平台不提前合并，比较一律同平台、同发布后窗口。</div>'+
+    '<div class="fi"><span class="fk">来源标注</span><span class="src pub">发布侧</span> 内容版本与发布记录 · <span class="src plat">平台侧</span> 播放 / 互动 / 观看时长 · <span class="src cust">客户回传</span> 进站之后的站内事件（虚线＝待授权，不填 0、不估算）。</div>'+
     '<div class="fi"><span class="fk">数据缺口</span>'+esc(p.name)+' 字段覆盖 '+(p.connected?esc(p.cov):"—")+'；缺口不补数、不估算。</div>'+
-    '<div class="fi"><span class="fk">状态图例</span>主色蓝=已接入 / 选中态 · 斜线=未接入</div>'+
+    '<div class="fi"><span class="fk">状态图例</span>主色蓝＝已接入 / 选中态 · 斜线＝未接入</div>'+
     '<div class="wm">示意界面 · 数据为示意值<br>单文件离线 · 无外部依赖</div>';
 }
 
@@ -900,7 +1098,7 @@ function tableHTML(id){
     const act=t.sort.k===c.k,arrow=act?(t.sort.dir>0?'↑':'↓'):'↕';
     h+='<th class="'+(c.num?'num ':'')+(c.nosort?'':'sortable ')+(act?'act':'')+'"'+
        (c.nosort?'':' data-tbl="'+id+'" data-k="'+c.k+'"')+(c.w?' style="width:'+c.w+'"':'')+'>'+
-       esc(c.label)+(c.nosort?'':'<span class="ar">'+arrow+'</span>')+'</th>';
+       esc(c.label)+(c.src?' <span class="src '+c.src[0]+'">'+esc(c.src[1])+'</span>':'')+(c.nosort?'':'<span class="ar">'+arrow+'</span>')+'</th>';
   });
   h+='</tr></thead><tbody>';
   rows.forEach(r=>{
@@ -933,10 +1131,10 @@ function viewOverview(p){
     aria:"平台周播放趋势"}));
   b+=cb("平台周播放趋势 · "+p.name,"单位：万 · 同平台同窗口（虚线为上周期）",
     tr+legend("ov-trend",[{key:"platform",label:p.name,color:COP,style:"solid",tog:1},{key:"bench",label:"同平台上周期",color:MUTED,style:"dash",tog:1}]),
-    "峰值出现在<b>第 3 周</b>：内容发布量与平台流量窗口同时到位，之后自然回落。");
+    "峰值出现在<b>第 3 周</b>：内容发布量与平台流量窗口同时到位，之后自然回落。",'<span class="src plat">平台侧</span>');
   const co=addChart("ov-contrib",w=>hbar({id:"ov-contrib",w:w,x0:110,x1:w-160,rows:p.contrib,aria:"内容类型播放贡献"}));
   b+=cb("内容类型播放贡献","横向条 · 按贡献量降序",co,
-    esc(p.name)+" 的播放主要来自<b>"+p.contrib[0].label+"</b>（"+p.contrib[0].disp+"），进站仍要看下一层的分类分析。");
+    esc(p.name)+" 的播放主要来自<b>"+p.contrib[0].label+"</b>（"+p.contrib[0].disp+"），进站仍要看下一层的分类分析。",'<span class="src plat">平台侧</span>');
   b=sect("趋势","TREND","先看变化，再看构成","两条轴：时间上的周趋势、空间上的内容构成。",b);
   let m='<div class="meters">';
   m+='<div><div class="meter"><div class="mt"><span>字段覆盖率</span><b>'+esc(p.cov)+'</b></div><div class="track"><div class="fill" style="width:'+p.covPct+'%"></div></div></div>'+
@@ -958,8 +1156,8 @@ function viewOverview(p){
   const tbl=mountTable("ov-tbl",cols,trows,true);
   b+=sect("明细","DETAIL","再看逐类型对账","表头可排序；点任意一行从右侧看该类型的明细。下表按内容量降序。",
     cb("内容类型明细","点表头排序 · 点行看明细",tbl,
-      "缺口不估算、不补数。"+esc(p.name)+" 状态见每行标签；未接入平台不进主视图。")+
-    cb("数据覆盖率","计量条 · 缺口用斜纹表示",m));
+      "缺口不估算、不补数。"+esc(p.name)+" 状态见每行标签；未接入平台不进主视图。",'<span class="src pub">发布侧</span> <span class="src plat">平台侧</span>')+
+    cb("数据覆盖率","计量条 · 缺口用斜纹表示",m,"",'<span class="src pub">发布侧</span> <span class="src plat">平台侧</span>'));
   return b;
 }
 function viewAccounts(p){
@@ -967,11 +1165,11 @@ function viewAccounts(p){
   const st=addChart("ac-stack",w=>stackBars({id:"ac-stack",w:w,x0:170,x1:w-120,rows:a.stack,aria:"号型分层构成"}));
   b+=cb("号型分层构成","100% 堆叠横向条 · hairline 分隔",
     st+legend("ac-stack",[{label:"正常存活",color:COP,style:"fill"},{label:"限流存活",color:"#C2D4E4",style:"fill"},{label:"封号",color:INK,style:"fill"}]),
-    "同样是「存活」，<b>限流账号集中在白号</b>：数量对账通过不等于结构健康。");
+    "同样是「存活」，<b>限流账号集中在白号</b>：数量对账通过不等于结构健康。",'<span class="src pub">发布侧</span>');
   const dm=addChart("ac-dots",w=>dotMatrix({id:"ac-dots",w:w,M:rot(dotBase,a.dotOff),peaks:peaksOf(rot(dotBase,a.dotOff)),
     hours:["00","02","04","06","08","10","12","14","16","18","20","22"],days:["周一","周二","周三","周四","周五","周六","周日"]}));
   b+=cb("发布时间窗分布","点阵 · 点大小＝同平台均播（刻度每 2 抽稀）",dm,
-    "均播峰值集中在当地 <b>18:00–22:00</b>；"+esc(p.name)+" 的峰值时段与已确认的排期有偏差，下一轮可对齐。");
+    "均播峰值集中在当地 <b>18:00–22:00</b>；"+esc(p.name)+" 的峰值时段与已确认的排期有偏差，下一轮可对齐。",'<span class="src pub">发布侧</span>');
   b=sect("趋势","TREND","先看结构，再看时间","号型决定产出结构，时间窗决定单位效率。",b);
   const gr=addChart("ac-grid",w=>statusGrid({id:"ac-grid",w:w,groups:a.grid}));
   let pr=mountTable("ac-tbl",[{k:"item",label:"项目",type:"str"},{k:"qty",label:"数量",num:1,type:"num",big:1,disp:r=>nf(r.qty)},
@@ -980,9 +1178,9 @@ function viewAccounts(p){
   b+=sect("明细","DETAIL","再看逐项对账","网格看个体，表格看交付。",
     cb("账号状态网格","每个方格＝1 个账号",
       gr+legend("ac-grid",[{label:"正常",color:COP,style:"fill"},{label:"限流",color:COP,style:"ring"},{label:"封号",color:INK,style:"fill"}]),
-      "共 "+a.grid.reduce((s,g)=>s+g.statuses.length,0)+" 个账号逐个可见；封号 "+a.rail[2][1]+" 个，限流 "+a.rail[3][1]+" 个。")+
+      "共 "+a.grid.reduce((s,g)=>s+g.statuses.length,0)+" 个账号逐个可见；封号 "+a.rail[2][1]+" 个，限流 "+a.rail[3][1]+" 个。",'<span class="src pub">发布侧</span>')+
     cb("发布对账","交付留档 · 与效果分析分列",pr,
-      "发布数量与状态属于<b>发布交付的留档对账</b>，含在发布服务内；内容效果分析单独计价。"));
+      "发布数量与状态属于<b>发布交付的留档对账</b>，含在发布服务内；内容效果分析单独计价。",'<span class="src pub">发布侧</span>'));
   return b;
 }
 function viewContent(p){
@@ -998,7 +1196,7 @@ function viewContent(p){
     aria:"三窗口累计播放对比"}));
   b+=cb("三窗口累计播放 vs 同规格基准","2 / 7 / 28 日 · 单位：千",
     band+legend("cn-band",[{key:"item",label:c.ver,color:COP,style:"solid",tog:1},{key:"med",label:"同规格中位数",color:COP,style:"dash",tog:1}]),
-    "全程高于基准带：<b>2 日已领先，7 日拉开</b>，28 日回落但仍在基准带上沿之上，不是单窗口波动。");
+    "全程高于基准带：<b>2 日已领先，7 日拉开</b>，28 日回落但仍在基准带上沿之上，不是单窗口波动。",'<span class="src plat">平台侧</span>');
   const rt=addChart("cn-ret",w=>plot({id:"cn-ret",w:w,h:208,pad:{l:50,r:22,t:24,b:32},
     labels:["0s","0.5s","1s","2s","3s","5s","7s","10s"],yMax:100,yTicks:[0,25,50,75,100],tickFmt:v=>v+"%",
     regions:[{x0i:0,x1i:4,label:"开头 0–3 秒"}],
@@ -1007,21 +1205,29 @@ function viewContent(p){
     aria:"开头留存曲线"}));
   b+=cb("开头留存曲线","秒 · 0–3 秒为开头段",
     rt+legend("cn-ret",[{key:"item",label:c.ver,color:COP,style:"solid",tog:1},{key:"med",label:"同批中位数",color:MUTED,style:"dash",tog:1}]),
-    "3 秒处 "+c.ret.item[4]+"%，高出同批中位 "+(c.ret.item[4]-c.ret.med[4])+" 个点；<b>留存优势在开头建立</b>，后段差距不再扩大。");
+    "3 秒处 "+c.ret.item[4]+"%，高出同批中位 "+(c.ret.item[4]-c.ret.med[4])+" 个点；<b>留存优势在开头建立</b>，后段差距不再扩大。",'<span class="src plat">平台侧</span>');
   b=sect("趋势","TREND","先看这条内容的时间轴","同一版本按窗口对齐，不与其他窗口混用。",b);
-  let cols=[{k:"title",label:"版本 / 标题",type:"str",w:"300px",disp:r=>esc(r.id)+" · "+esc(r.title)},
-    {k:"cat",label:"类别",type:"str",w:"88px",disp:r=>'<span class="tag c">'+esc(r.cat)+'</span>'},
+  let cols=[{k:"title",label:"版本 / 标题",type:"str",w:"230px",disp:r=>esc(r.id)+" · "+esc(r.title)},
+    {k:"cat",label:"类别",type:"str",w:"68px",disp:r=>'<span class="tag c">'+esc(r.cat)+'</span>'},
+    {k:"eopen",label:"开头",type:"str",w:"80px",sortVal:r=>(ELEM[r.id]||{}).open,disp:r=>esc((ELEM[r.id]||{}).open)},
+    {k:"estruct",label:"结构",type:"str",w:"64px",sortVal:r=>(ELEM[r.id]||{}).struct,disp:r=>esc((ELEM[r.id]||{}).struct)},
+    {k:"edemo",label:"演示形式",type:"str",w:"86px",sortVal:r=>(ELEM[r.id]||{}).demo,disp:r=>esc((ELEM[r.id]||{}).demo)},
+    {k:"edur",label:"时长分段",type:"str",w:"84px",sortVal:r=>(ELEM[r.id]||{}).dur,disp:r=>esc((ELEM[r.id]||{}).dur)},
+    {k:"ecta",label:"行动引导",type:"str",w:"100px",sortVal:r=>(ELEM[r.id]||{}).cta,disp:r=>esc((ELEM[r.id]||{}).cta)},
     {k:"playN",label:"播放",num:1,type:"num",big:1,disp:r=>r.play},
     {k:"engv",label:"互动率",num:1,type:"num",sortVal:r=>parseFloat(r.eng),disp:r=>r.eng},
-    {k:"clickv",label:"进站",num:1,type:"num",sortVal:r=>parseInt(r.click.replace(/,/g,""),10),disp:r=>r.click},
-    {k:"regv",label:"注册",num:1,type:"num",sortVal:r=>parseInt(r.reg,10),disp:r=>r.reg},
-    {k:"win",label:"窗口",type:"str",w:"70px",disp:r=>'<span class="tag">'+esc(r.win)+'</span>'}];
+    {k:"clickv",label:"进站",src:["plat","平台侧"],num:1,type:"num",sortVal:r=>parseInt(r.click.replace(/,/g,""),10),disp:r=>r.click},
+    {k:"regv",label:"注册",src:["cust","客户回传"],num:1,type:"num",sortVal:r=>parseInt(r.reg,10),disp:r=>r.reg},
+    {k:"win",label:"窗口",type:"str",w:"62px",disp:r=>'<span class="tag">'+esc(r.win)+'</span>'}];
   const tbl=mountTable("cn-tbl",cols,c.rows.map(r=>({...r,_drawer:{kind:"ver",row:r,p:p}})),true);
   let right='';
   c.panels.forEach((pn,i)=>{right+='<div class="panel"'+(i?' style="margin-top:14px"':'')+'><h4>'+esc(pn[0])+'</h4><p>'+esc(pn[1].split("｜")[0])+(
     pn[1].split("｜")[1]?'</p><p>'+esc(pn[1].split("｜")[1]):'')+'</p></div>';});
-  b+=sect("明细","DETAIL","再看这条内容本身","点任意一行从右侧抽屉看成品位、开头三秒转录、标签与 2/7/28 三窗口对比。",
-    '<div class="cols"><div>'+cb("版本对比","显示全量中的前 4 条 · 点行看详情",tbl)+'</div><div>'+right+'</div></div>');
+  b+=sect("明细","DETAIL","再看这条内容本身","列表已含八个要素的前五列，可直接排序；点行看完整八要素与「本条 vs 同批中位数」。",
+    cb("版本对比 · 含内容要素","前 4 条 · 表头可排序 · 点行看八要素抽屉",tbl,
+      "进站＝平台侧；注册＝客户回传。要素编码来自转录与逐条标注，标注在人工。",
+      '<span class="src plat">平台侧</span> <span class="src cust">客户回传</span>')+
+    '<div class="cols-3" style="margin-top:20px">'+right+'</div>');
   return b;
 }
 function viewCategories(p){
@@ -1030,13 +1236,13 @@ function viewCategories(p){
     ticks:[0,c.xMax/2,c.xMax],fmt:v=>nf(v),rfmt:nf,aria:"主题播放中位数与分布范围"}));
   b+=cb("按主题：中位数与分布范围","横向条 · 中位数为准，范围＝P25–P75 · 单位：条播放",
     rg+legend("ct-range",[{label:"播放中位数",color:COP,style:"solid"},{label:"P25–P75 区间",color:"#C2D4E4",style:"fill"}]),
-    "中位数排序后 <b>"+c.ranges[0].name+" 居前</b>；均播易受爆款拉动，所以用中位数为准。");
+    "中位数排序后 <b>"+c.ranges[0].name+" 居前</b>；均播易受爆款拉动，所以用中位数为准。",'<span class="src plat">平台侧</span>');
   const hg=addChart("ct-heat",w=>heatGrid({id:"ct-heat",w:w,cols:c.heatCols,rows:c.heatRows,V:c.heatV,fmt:c.heatFmt}));
   b+=cb("分类 × 指标热力格","按列归一化着色 · 格内为真实值",
     hg+'<div class="legend"><span class="lgitem">低</span>'+
     [0.10,0.30,0.50,0.70,0.90].map(a=>'<span class="sw fill" style="background:rgba(78,121,167,'+a+');height:12px;width:26px"></span>').join('')+
     '<span class="lgitem">高（按列归一化）</span></div>',
-    "<b>"+esc(c.ranges[0].name)+" 行整体最深</b>；「产品介绍」的注册率最浅而进站率居中——两个指标指向不同动作。");
+    "<b>"+esc(c.ranges[0].name)+" 行整体最深</b>；「产品介绍」的注册率最浅而进站率居中——两个指标指向不同动作。",'<span class="src plat">平台侧</span>');
   b=sect("趋势","TREND","先看类别排序，再看类别×指标","排序回答「哪个类别值得加投」，热力格回答「为什么」。",b);
   const mk=mountTable("ct-mk",[{k:"x0",label:"制作方式",type:"str",w:"150px"},{k:"x1",label:"样本",num:1,type:"num"},
     {k:"x2",label:"播放中位数",num:1,type:"num",big:1},{k:"x3",label:"进站率",num:1,type:"num"}],
@@ -1045,17 +1251,22 @@ function viewCategories(p){
     {k:"x2",label:"3 秒留存",num:1,type:"num",big:1},{k:"x3",label:"进站率",num:1,type:"num"}],
     c.open.map(r=>({x0:r[0],x1:r[1],x2:r[2],x3:r[3]})));
   b+=sect("明细","DETAIL","再看两条辅助轴","制作方式与开头类型是两条可直接改动的杠杆。表头可排序。",
-    '<div class="cols-2">'+cb("按制作方式","播放中位数 · 进站率",mk)+cb("按开头类型","3 秒留存 · 进站率",op)+'</div>');
+    '<div class="cols-2">'+cb("按制作方式","播放中位数 · 进站率",mk,"",'<span class="src plat">平台侧</span> <span class="src pub">发布侧</span>')+cb("按开头类型","3 秒留存 · 进站率",op,"",'<span class="src plat">平台侧</span>')+'</div>');
   return b;
 }
 function viewReport(p){
-  const r=p.rep;let b='';
-  let concl='<div class="cols"><div>';
-  r.findings.forEach(f=>{const i=f.indexOf("、");concl+='<p><b>'+esc(f.slice(0,i+1))+'</b>'+esc(f.slice(i+1))+'</p>';});
-  concl+='</div><div><div class="panel"><h4>本期数据缺口</h4><p>'+esc(p.name)+' 字段覆盖 '+esc(p.cov)+
-    '；缺口不补数、不估算，已在平台总览标注。</p></div>'+
-    '<div class="panel" style="margin-top:14px"><h4>口径声明</h4><p>所有比较同平台、同发布后窗口；缺失、真实零值、不适用分别显示；只写相关不写因果。</p></div></div></div>';
-  b=sect("结论","FINDING","先给判断，再给依据","一个界面只放结论与数据，口径与缺口沉到页脚。",concl);
+  const r=p.rep,srcs=REPSRC[STATE.platform]||[],gap=GAP[STATE.platform]||{items:[]};let b='';
+  let concl='';
+  r.findings.forEach((f,idx)=>{
+    const i=f.indexOf("、"),ev=(srcs[idx]&&srcs[idx].ev)||[];
+    concl+='<div class="chartbox"'+(idx?' style="margin-top:14px"':'')+'>'+
+      '<p style="font-size:var(--fs-body);color:var(--ink);line-height:var(--lh-body)"><b>'+esc(f.slice(0,i+1))+'</b>'+esc(f.slice(i+1))+'</p>'+
+      '<div class="evid">'+ev.map(e=>'<div class="e"><span class="k">'+esc(e[0])+'</span><span class="v">'+esc(e[1])+'</span></div>').join('')+'</div></div>';
+  });
+  concl+='<div class="cols" style="margin-top:22px"><div class="panel"><h4>缺口声明</h4><ul style="margin:6px 0 0 16px;font-size:var(--fs-body);color:var(--brown);line-height:var(--lh-body)">'+
+    gap.items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+    '<div class="panel"><h4>口径声明</h4><p>所有比较同平台、同发布后窗口；缺失、真实零值、不适用分别显示；只写相关不写因果。缺任何一项证据的结论，降级为观察。</p></div></div>';
+  b=sect("结论","FINDING","先给判断，每行带五样证据","一条结论必须同时带样本数、分母、窗口、来源、采集时间，缺一项即降级为观察。",concl);
   let acts='<div class="cols-3" id="acts">';
   r.actions.forEach((a,i)=>{
     acts+='<div class="act" data-act="'+i+'"><span class="an">'+esc(a.n)+'</span><h4>'+esc(a.title)+'</h4>'+
@@ -1075,9 +1286,62 @@ function viewReport(p){
     {name:"上轮测试执行",date:"09-16 → 10-06",st:"done"},{name:"本期报告交付",date:"10-14",st:"done"},
     {name:"解读会",date:"10-17 15:00",st:"cur"},{name:"下轮发布",date:"10-20 起",st:"next"},{name:"复测窗口",date:"发布后 7 / 28 日",st:"next"}]}));
   b+=sect("节奏","RHYTHM","再看交付节奏","报告不是终点：每个节点都回到同一项目、同一指标。",
-    cb("交付节奏","发布日期 → 报告 → 复测",tl)+
+    cb("交付节奏","发布日期 → 报告 → 复测",tl,"",'<span class="src pub">发布侧</span>')+
     '<div class="actions" style="display:flex;gap:8px;margin-top:18px"><span class="chip">下载报告 PDF</span>'+
     '<span class="chip">下载授权范围内明细</span><span class="chip">加入下一轮需求</span></div>');
+  return b;
+}
+function viewConversion(p){
+  const c=CONV[STATE.platform];if(!c)return '';
+  const src='<span class="src cust">客户回传</span>';
+  let b='<div class="srcbanner">'+src+'<span>整页来源＝<b>客户回传</b>（进站之后的站内事件）。未接通的阶段显示 <b>待授权</b>，只列需要的字段，<b>不填 0、不估算</b>。</span></div>';
+  const fn=addChart("cv-funnel",w=>funnel({id:"cv-funnel",w:w,rows:c.funnel}));
+  b+=cb("转化漏斗 · 五段","可追踪点击 → 进站 → 注册 / 试用 → 激活 → 询盘",
+    fn+'<div class="legend"><span class="lgitem"><span class="sw fill" style="background:'+COP+'"></span>已接通（有数据）</span><span class="lgitem"><span class="sw fill" style="background:#DCE0E6"></span>未接通（待授权，非 0）</span></div>',
+    "已接通 3 段、未接通 2 段。未接通段以斜纹块呈现，<b>不填 0、不估算</b>。",src);
+  b+='<div class="chartbox" style="margin-top:16px"><div class="cb-head"><h3>未接通示例态 · 激活 / 询盘</h3><div class="cb-meta"><span class="cb-sub">需客户提供哪些字段</span><span class="cb-src">来源 <span class="src pend">待授权</span></span></div></div>'+
+    '<p class="cb-note" style="margin:0 0 8px">这一段答不了，不是「数据为 0」，而是<b>缺口径</b>：激活与询盘只在客户站内产生，没有授权就没有分母。</p>'+
+    '<button class="tog" type="button" data-rev="convfields" style="font-size:var(--fs-axis);color:var(--sub);border-bottom:1px solid var(--line-2);padding-bottom:1px">需要客户提供哪些字段 →</button>'+
+    '<div class="revlist" id="convfields"><ul>'+c.fields.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div></div>';
+  let dims='';
+  [["content","内容"],["account","账号"],["platform","平台"],["market","市场"]].forEach(dd=>{
+    const d=c.dims[dd[0]];
+    const ch=addChart("cv-"+dd[0],w=>hbar({id:"cv-"+dd[0],w:w,x0:96,x1:w-150,rows:d.rows,aria:d.title}));
+    dims+=cb(d.title,"横向条 · 注册数",ch,"",src);
+  });
+  b+=sect("拆解","BREAKDOWN","按内容 / 账号 / 平台 / 市场四向拆解","同一批注册按四个维度分开看，回答「哪类内容值得加投」。",
+    '<div class="cols-2">'+dims+'</div>');
+  const cols=[{k:"title",label:"版本 / 标题",type:"str",w:"430px",disp:r=>esc(r.id)+" · "+esc(r.title)},
+    {k:"regN",label:"注册数",num:1,type:"num",big:1,disp:r=>r.reg},
+    {k:"cost",label:"单位注册成本",num:1,type:"num",sortVal:r=>parseFloat(r.cost.replace(/[^\d.]/g,"")),disp:r=>r.cost}];
+  const tbl=mountTable("cv-tbl",cols,c.rows.map(r=>({...r})));
+  b+=sect("明细","DETAIL","再看每条内容带来的注册与单位成本","注册为客户回传；成本单位为元。表头可排序。",
+    cb("每条内容注册数 · 单位成本","按注册数降序 · 表头可排序",tbl,
+      "单位成本＝（内容制作成本 ＋ 投放成本）÷ 注册数；投放成本由客户回传，未回传的条目不列成本。",src));
+  return b;
+}
+function viewHot(p){
+  const h=HOT[STATE.platform];if(!h)return '';
+  const src='<span class="src plat">平台侧</span>';
+  let b='';
+  const dch=addChart("hot-dist",w=>cmpbars({id:"hot-dist",w:w,labelW:150,rows:h.dist.map(r=>({label:r.label,a:r.head,b:r.all,aDisp:r.headDisp,bDisp:r.allDisp})),aName:"头部内容",bName:"赛道基准",aria:"赛道头部内容要素分布与基准"}));
+  b+=cb("要素分布 · 头部内容 vs 赛道基准","单位为占比 % · 与内容分析同一套八要素编码",
+    dch+'<div class="legend"><span class="lgitem"><span class="sw fill" style="background:'+COP+'"></span>头部内容</span><span class="lgitem"><span class="sw fill" style="background:#93B0CC"></span>赛道基准（全部样本）</span></div>',
+    "头部内容里 <b>「结果先行」明显高于赛道基准</b>——这个赛道的头部表达高度集中在结果先行。",src);
+  b=sect("趋势","TREND","先看赛道头部在用什么表达","公开热门内容按同一套要素编码，先给分布与基准线。",b);
+  const cc=mountTable("hot-cmp",[{k:"label",label:"要素",type:"str",w:"200px",disp:r=>esc(r.label)},
+    {k:"mine",label:"我的内容",type:"str",w:"120px"},{k:"track",label:"赛道基准",type:"str",w:"120px"},
+    {k:"gap",label:"差",type:"str",w:"90px",nosort:1,disp:r=>'<span class="tag ok">'+esc(r.gap)+'</span>'}],h.cmp.map(r=>({...r})));
+  const cols=[{k:"rank",label:"#",num:1,type:"num",w:"42px"},{k:"title",label:"内容",type:"str",disp:r=>esc(r.title)},
+    {k:"acct",label:"账号",type:"str",w:"118px"},{k:"play",label:"播放",num:1,type:"num",big:1},
+    {k:"open",label:"开头类型",type:"str",w:"92px"},{k:"dur",label:"时长",type:"str",w:"92px"},
+    {k:"collect",label:"采集时间",type:"str",w:"100px"}];
+  const bt=mountTable("hot-board",cols,h.board.map(r=>({...r})));
+  b+=sect("明细","DETAIL","我的内容 vs 赛道，再看榜单","榜单带样本量与来源；全部为平台侧公开数据，不依赖客户回传。",
+    cb("我的内容 vs 赛道 · 要素对照","逐要素对照 · 差列＝我的减赛道",cc,
+      "赛道为平台侧公开数据；我的内容来自本项目同批。",src)+
+    cb("赛道热门榜单 · 近 30 日",h.boardNote,bt,
+      "榜单口径：平台侧公开内容；样本量与采集时间见表头与标题。",src));
   return b;
 }
 function viewLocked(id,p){
@@ -1099,7 +1363,7 @@ function viewFacebook(p){
 /* =========================================================================
    4. 状态与渲染循环
    ========================================================================= */
-const IMPL={overview:1,accounts:1,content:1,categories:1,report:1};
+const IMPL={overview:1,accounts:1,content:1,categories:1,conversion:1,hot:1,report:1};
 let STATE={view:"overview",platform:"tiktok",open:null};
 
 function renderNav(){
@@ -1136,7 +1400,8 @@ function renderHead(){
   const p=P[STATE.platform],v=STATE.view;
   let crumb,h1,lead;
   if(!p.connected){crumb="分析 / "+p.name;h1=p.name+" · 未接入";lead="未接入的平台不进主视图：不填 0、不估算、不留白屏。";}
-  else if(IMPL[v]){const t=VIEWTITLE[v];crumb=t[0]+(v==="content"?" / "+p.cnt.ver:"");h1=(v==="content"?t[1]+" · "+p.cnt.ver:t[1]);lead=v==="overview"?p.lead:p[v==="accounts"?"acc":v==="content"?"cnt":v==="categories"?"cat3":"rep"].lead;}
+  else if(IMPL[v]){const t=VIEWTITLE[v];crumb=t[0]+(v==="content"?" / "+p.cnt.ver:"");h1=(v==="content"?t[1]+" · "+p.cnt.ver:t[1]);
+    lead=v==="overview"?p.lead:v==="accounts"?p.acc.lead:v==="content"?p.cnt.lead:v==="categories"?p.cat3.lead:v==="conversion"?((CONV[STATE.platform]||{}).lead||""):v==="hot"?((HOT[STATE.platform]||{}).lead||""):p.rep.lead;}
   else{const g=NAVGROUPS.find(gr=>gr[1].some(x=>x[0]===v));crumb="分析 / "+g[0]+" / "+(g[1].find(x=>x[0]===v)[1]);h1=g[1].find(x=>x[0]===v)[1];lead="该模块显示为可解锁状态：它回答什么、怎么解锁，都写在这一屏。";}
   document.getElementById('pageHead').innerHTML='<div><div class="crumb">'+esc(crumb)+'</div><h1>'+esc(h1)+'</h1></div>'+
     '<div class="lead">'+lead+'</div>';
@@ -1149,6 +1414,8 @@ function renderView(){
   else if(v==="accounts")html=viewAccounts(p);
   else if(v==="content")html=viewContent(p);
   else if(v==="categories")html=viewCategories(p);
+  else if(v==="conversion")html=viewConversion(p);
+  else if(v==="hot")html=viewHot(p);
   else if(v==="report")html=viewReport(p);
   else html=viewLocked(v,p);
   h.innerHTML=(p.connected&&IMPL[v])?kpiBand(viewKpi(p,v))+html:'<div style="margin-top:8px"></div>'+html;
@@ -1160,6 +1427,8 @@ function viewKpi(p,v){
   if(v==="accounts")return p.acc;
   if(v==="content")return {ns:p.cnt.ns,i2:p.cnt.i2,i3:p.cnt.i3,i4:p.cnt.i4,rail:p.cnt.rail};
   if(v==="categories")return {ns:p.cat3.ns,i2:p.cat3.i2,i3:p.cat3.i3,i4:p.cat3.i4,rail:p.cat3.rail};
+  if(v==="conversion")return CONV[STATE.platform].kpi;
+  if(v==="hot")return HOT[STATE.platform].kpi;
   return {ns:p.rep.ns,i2:p.rep.i2,i3:p.rep.i3,i4:p.rep.i4,rail:p.rep.rail};
 }
 function renderFooter(){document.getElementById('footnote').innerHTML=footnote(P[STATE.platform]);}
@@ -1199,6 +1468,8 @@ document.addEventListener('click',e=>{
   const lg=e.target.closest('[data-lg]');
   if(lg){const id=lg.dataset.lg,k=lg.dataset.key;HIDDEN[id]=HIDDEN[id]||{};HIDDEN[id][k]=!HIDDEN[id][k];
     const y=window.scrollY;mountChartsRefresh();window.scrollTo(0,y);return;}
+  const rev=e.target.closest('[data-rev]');
+  if(rev){const t=document.getElementById(rev.dataset.rev);if(t){const opn=t.classList.toggle('open');rev.textContent=opn?'收起字段清单':'需要客户提供哪些字段 →';}return;}
   const tog=e.target.closest('[data-tog]');
   if(tog){const card=tog.closest('.act');card.classList.toggle('open');
     tog.textContent=card.classList.contains('open')?(card.classList.contains('cand')?"收起":"收起证据"):(card.classList.contains('cand')?"看为什么不列":"展开证据");
@@ -1243,17 +1514,23 @@ function closeDrawer(){
   document.getElementById('scrim').classList.remove('on');STATE.open=null;updateHash();
 }
 function drawerVer(d){
-  const r=d.row,p=d.p;
+  const r=d.row,p=d.p,e=ELEM[r.id]||{},med=ELMED[STATE.platform]||{};
+  const elrows=[["开头（0–3 秒）","open"],["结构","struct"],["演示形式","demo"],["封面与标题","cover"],["时长分段","dur"],["行动引导","cta"],["语种与字幕","lang"],["信息密度","density"]];
   return '<div class="dh"><div><div class="crumb">单条内容 / '+esc(r.id)+'</div><h3>'+esc(r.title)+'</h3></div>'+
     '<button class="x" type="button">关闭</button></div><div class="db">'+
     '<div class="dblock"><div class="dlab">成品位</div><div class="slot">'+
     '<div class="slotframe hatch"><span>成品预览位</span><small>示意 · 未加载视频</small></div>'+
     '<div><div class="slotmeta">'+esc(p.name)+' · '+esc(r.slot)+'</div>'+
     '<div class="dl-list"><div><dt>类别</dt><dd>'+esc(r.cat)+'</dd></div>'+
-    '<div><dt>7 日播放</dt><dd>'+esc(r.play)+'</dd></div>'+
-    '<div><dt>互动率</dt><dd>'+esc(r.eng)+'</dd></div>'+
-    '<div><dt>进站 / 注册</dt><dd>'+esc(r.click)+' / '+esc(r.reg)+'</dd></div></div></div></div></div>'+
+    '<div><dt>7 日播放</dt><dd>'+esc(r.play)+' <span class="src plat">平台侧</span></dd></div>'+
+    '<div><dt>互动率</dt><dd>'+esc(r.eng)+' <span class="src plat">平台侧</span></dd></div>'+
+    '<div><dt>进站 / 注册</dt><dd>'+esc(r.click)+' <span class="src plat">平台侧</span> / '+esc(r.reg)+' <span class="src cust">客户回传</span></dd></div></div></div></div></div>'+
     '<div class="dblock"><div class="dlab">开头三秒转录</div><div class="quote">'+esc(r.tr)+'</div></div>'+
+    '<div class="dblock"><div class="dlab">八要素编码 · 本条 vs 同批中位数</div>'+
+    '<table class="elcmp"><thead><tr><th>要素</th><th>本条</th><th>同批中位数</th></tr></thead><tbody>'+
+    elrows.map(x=>'<tr><td>'+esc(x[0])+'</td><td>'+esc(e[x[1]]||"—")+'</td><td>'+esc(med[x[1]]||"—")+'</td></tr>').join('')+
+    '</tbody></table>'+
+    '<div class="cb-note" style="margin-top:8px">要素编码来源：转录与逐条标注（发布侧＋平台侧＋标注）。分类要素的「同批中位数」取同批众数与其占比。</div></div>'+
     '<div class="dblock"><div class="dlab">标签</div><div class="tags">'+r.tags.map(t=>'<span class="tag c">'+esc(t)+'</span>').join('')+'</div></div>'+
     '<div class="dblock"><div class="dlab">2 / 7 / 28 日三窗口对比</div>'+
     miniBars({w:380,vmax:r.w[2],items:[{label:"2 日",value:r.w[0],disp:nf(r.w[0])},{label:"7 日",value:r.w[1],disp:nf(r.w[1])},{label:"28 日",value:r.w[2],disp:nf(r.w[2])}]})+
@@ -1325,6 +1602,17 @@ function delegateTip(){
       const j=Math.round((sx-info.x0)/((info.x1-info.x0)/(info.nx-1))),i=Math.round((sy-info.y0)/((info.y1-info.y0)/(info.ny-1)));
       if(i<0||i>6||j<0||j>11){hideTip();return;}
       html='<div class="tt">'+info.days[i]+' · '+info.hours[j]+':00</div><div class="tr"><span class="nm">该窗均播档</span><span class="vv">'+info.M[i][j]+' / 5</span></div>';
+    } else if(info.kind==="funnel"){
+      const i=Math.floor((sy-info.top)/info.rh);if(i<0||i>=info.rows.length){hideTip();return;}
+      const r=info.rows[i];
+      html='<div class="tt">'+esc(r.label)+'</div>'+(r.pending
+        ?'<div class="tr"><span class="nm">状态</span><span class="vv">待授权</span></div><div class="tr"><span class="nm">来源</span><span class="vv">客户回传</span></div>'
+        :'<div class="tr"><span class="nm">'+swatch(COP)+'数量</span><span class="vv">'+esc(r.disp)+'</span></div>');
+    } else if(info.kind==="cmp"){
+      const i=Math.floor((sy-info.top)/info.rh);if(i<0||i>=info.rows.length){hideTip();return;}
+      const r=info.rows[i];
+      html='<div class="tt">'+esc(r.label)+'</div><div class="tr"><span class="nm">'+swatch(COP)+esc(info.aName)+'</span><span class="vv">'+esc(r.aDisp)+'</span></div>'+
+        '<div class="tr"><span class="nm">'+swatch("#93B0CC")+esc(info.bName)+'</span><span class="vv">'+esc(r.bDisp)+'</span></div>';
     }
     if(!html){hideTip();return;}
     showTip(html,e.clientX,e.clientY);
