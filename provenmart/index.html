@@ -250,6 +250,21 @@ h1{font-size:var(--fs-h1);font-weight:600;letter-spacing:.01em;line-height:var(-
 .tip .tr .nm{display:flex;align-items:center;gap:6px;color:var(--sub)}
 .tip .tr .vv{font-family:var(--mono);color:var(--ink)}
 
+/* 交叉矩阵（HTML 网格，单元格可点下钻） */
+.mxgrid{display:grid;gap:6px}
+.mxgrid .mh{font-size:var(--fs-axis);color:var(--meta);line-height:var(--lh-axis);padding:2px 4px}
+.mxgrid .mr{font-size:var(--fs-axis);color:var(--ink);line-height:var(--lh-axis);padding:8px 4px;font-weight:600}
+.mxcell{display:flex;flex-direction:column;gap:1px;justify-content:center;text-align:left;border:1px solid var(--card-line);background:var(--card);border-radius:4px;padding:6px 8px;line-height:var(--lh-axis);min-height:46px}
+button.mxcell{cursor:pointer}
+button.mxcell:hover{border-color:var(--axis);background:var(--band)}
+.mxcell .mv{font-family:var(--mono);font-size:var(--fs-body);color:var(--ink)}
+.mxcell .mn{font-size:var(--fs-axis);color:var(--sub)}
+.mxcell.empty{background:var(--band);border-style:dashed;color:var(--off);text-align:center;font-family:var(--mono);font-size:var(--fs-axis)}
+button.mxcell.empty{cursor:default}
+.seg-tabs{display:inline-flex;gap:6px;margin-bottom:16px}
+.seg-tabs .tab{border:1px solid var(--card-line);background:var(--card);border-radius:4px;padding:6px 14px;font-size:var(--fs-body);color:var(--sub)}
+.seg-tabs .tab.on{background:var(--band);border-color:var(--axis);color:var(--ink);font-weight:600}
+
 #view{opacity:1}
 #view.entering{opacity:0;transform:translateY(8px)}
 #view.enter{opacity:1;transform:none;transition:opacity .18s ease,transform .18s ease}
@@ -300,11 +315,13 @@ function spark(vals,w,h){ w=w||112; h=h||30;
     '<polyline points="'+pts+'" fill="none" stroke="'+C1+'" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'+
     '<circle cx="'+fm(X(n-1))+'" cy="'+fm(Y(vals[n-1]))+'" r="2.3" fill="'+C1+'"/></svg>';
 }
+/* 分位数（线性插值） */
+function quantile(arr,q){const a=arr.slice().sort((x,y)=>x-y);if(!a.length)return null;const pos=(a.length-1)*q,b=Math.floor(pos),r=pos-b;return a[b+1]!==undefined?a[b]+(a[b+1]-a[b])*r:a[b];}
 
 /* =========================================================================
    1. 图表（全部内联 SVG，无外部库）
    ========================================================================= */
-const CHART={};const HIDDEN={};
+const CHART={};const HIDDEN={};const MX={};
 const isHidden=(id,k)=>(HIDDEN[id]&&HIDDEN[id][k])||false;
 function legend(id,items){
   let h='<div class="legend">';
@@ -499,7 +516,7 @@ function stackBars(cfg){
   rows.forEach((r,i)=>{
     const cy=top+i*rh; let x=x0;
     s.push('<text class="ax2" x="0" y="'+fm(cy+14)+'" fill="'+INK+'">'+esc(r.name)+'</text>');
-    s.push('<text class="ax" x="0" y="'+fm(cy+29)+'">'+r.total+' 个账号</text>');
+    s.push('<text class="ax" x="0" y="'+fm(cy+29)+'">'+esc(r.sub||(r.total+' 个账号'))+'</text>');
     r.seg.forEach(sg=>{
       if(sg.v<=0)return;
       const seg=full*sg.v/r.total;
@@ -538,6 +555,59 @@ function miniBars(cfg){
     s.push('<text class="vl" x="'+fm(x1+8)+'" y="'+fm(cy+10)+'">'+esc(it.disp)+'</text>');
   });
   return s.join('')+'</svg>';
+}
+/* 箱线（P10–P90 + P25–P75 + 中位 + n） · 每行一组 */
+function boxPlot(cfg){
+  const w=cfg.w,groups=cfg.groups,pad={l:120,r:152,t:16,b:30},rh=42,bh=18;
+  const all=[];groups.forEach(g=>(g.values||[]).forEach(v=>{if(v!=null)all.push(v);}));
+  const max=cfg.xMax||(Math.max.apply(null,all.length?all:[1])*1.06||1);
+  const x0=pad.l,x1=w-pad.r,X=v=>x0+(x1-x0)*Math.min(v,max)/max;
+  const H=pad.t+rh*groups.length+pad.b;
+  let s=['<svg class="chart" viewBox="0 0 '+w+' '+H+'" role="img" aria-label="'+esc(cfg.aria||"")+'">'];
+  (cfg.ticks||[]).forEach(t=>{const x=X(t);
+    s.push('<line x1="'+fm(x)+'" y1="'+fm(pad.t)+'" x2="'+fm(x)+'" y2="'+fm(pad.t+rh*groups.length)+'" stroke="'+LINE+'" stroke-width="1" stroke-dasharray="1 3"/>');
+    s.push('<text class="ax" x="'+fm(x)+'" y="'+fm(H-7)+'" text-anchor="middle">'+(cfg.tickFmt?cfg.tickFmt(t):nf(t))+'</text>');});
+  const bars=[];
+  groups.forEach((g,i)=>{
+    const cy=pad.t+i*rh+rh/2, v=(g.values||[]).filter(x=>x!=null).slice().sort((a,b)=>a-b), n=v.length;
+    s.push('<text class="ax2" x="0" y="'+fm(cy-2)+'" fill="'+INK+'">'+esc(g.name)+'</text>');
+    s.push('<text class="ax" x="0" y="'+fm(cy+13)+'">n='+n+' 条</text>');
+    if(n){
+      const lo=quantile(v,.1),q1=quantile(v,.25),med=quantile(v,.5),q3=quantile(v,.75),hi=quantile(v,.9);
+      s.push('<line x1="'+fm(X(lo))+'\x22 y1="'+fm(cy)+'" x2="'+fm(X(hi))+'\x22 y2="'+fm(cy)+'" stroke="'+G3+'" stroke-width="1.6"/>');
+      s.push('<rect x="'+fm(X(q1))+'\x22 y="'+fm(cy-bh/2)+'" width="'+fm(Math.max(2,X(q3)-X(q1)))+'" height="'+bh+'" fill="'+G2+'" stroke="'+G3+'" stroke-width="1"/>');
+      s.push('<line x1="'+fm(X(med))+'\x22 y1="'+fm(cy-bh/2-4)+'" x2="'+fm(X(med))+'\x22 y2="'+fm(cy+bh/2+4)+'" stroke="'+C1+'" stroke-width="2.6"/>');
+      s.push('<text class="vl" x="'+fm(x1+10)+'" y="'+fm(cy+4)+'">中位 '+(cfg.disp?cfg.disp(med):nf(med))+'</text>');
+      bars.push({name:g.name,n:n,med:med,lo:lo,hi:hi,y:cy,h:rh});
+    }else{
+      s.push('<text class="ax" x="'+fm(x0+8)+'" y="'+fm(cy+4)+'">无样本</text>');
+    }
+  });
+  s.push('</svg>');
+  CHART[cfg.id]={kind:"box",w:w,bars,fmt:nf};
+  return s.join('');
+}
+/* 交叉矩阵（HTML 网格，有样本的单元格可点下钻） */
+function matrixGrid(cfg){
+  const cols=cfg.cols,rows=cfg.rows;
+  let s='<div class="mxgrid" style="grid-template-columns:'+cfg.labelW+'px repeat('+cols.length+',minmax(92px,1fr))">';
+  s+='<div class="mh"></div>';
+  cols.forEach(c=>s+='<div class="mh">'+esc(c)+'</div>');
+  rows.forEach((r,i)=>{
+    s+='<div class="mr">'+esc(r)+'</div>';
+    cols.forEach((c,j)=>{
+      const cell=(cfg.cells[i]||[])[j];
+      if(!cell||!cell.n){s+='<div class="mxcell empty">—</div>';}
+      else{
+        s+='<button class="mxcell" type="button" data-mx="'+cfg.id+'" data-i="'+i+'" data-j="'+j+'">'+
+          '<span class="mv">'+esc(cell.disp)+'</span>'+
+          '<span class="mn">n='+cell.n+(cell.ratio?' · '+esc(cell.ratio):'')+'</span></button>';
+      }
+    });
+  });
+  s+='</div>';
+  MX[cfg.id]={cells:cfg.cells};
+  return s;
 }
 
 /* =========================================================================
@@ -635,7 +705,7 @@ const PLAT={
     comments:{got:620,total:1540,intent:[["使用疑问",27],["正向反馈",25],["购买意图",24],["比较／竞品",13],["负面／质疑",11]],
       buyRate:"9.4%",buyNum:58,
       top:[["请问能导出成文字吗？我想接到自己的笔记里。",412],["Does it work with a second phone for family? 想给爸妈也配一个。",268],["Where to buy? 官网上没看到直邮。",196]],
-      gap:[["导出／对接第三方笔记","评论 96 条提及 · 素材 0 条"],["多人／家庭共享","评论 41 条提及 · 素材 0 条"],["购买与物流入口","评论 58 条提及 · 素材 2 条"]]},
+      gap:[["导出／对接第三方笔记","评论 96 条提及 · 素材 0 条","补一条「问一句 → 核对片段 → 导出」的完整操作演示"],["多人／家庭共享","评论 41 条提及 · 素材 0 条","补设备互看与账号边界的可见演示"],["购买与物流入口","评论 58 条提及 · 素材 2 条","补主页挂链落点与直邮范围的事实说明"]]},
     creators:{bench:[["@secondmemory","记忆外挂","1.4M 粉","TikTok","结果先行 · 真人","寄样合作"],["@offload_ai",  "AI 效率","860K 粉","TikTok","录屏 · Tutorial","KOC 引入"],["@promptkit","提示词工具","520K 粉","TikTok","清单 · 教程","品牌背书"],["@dayinlife","生活方式 UGC","380K 粉","TikTok","POV · 日常","寄样合作"],["@ai_probe","AI 实测","210K 粉","TikTok","提问 · 实测","KOC 引入"]]}
   },
   instagram:{
@@ -687,7 +757,7 @@ const PLAT={
     comments:{got:340,total:810,intent:[["正向反馈",28],["使用疑问",26],["购买意图",21],["比较／竞品",14],["负面／质疑",11]],
       buyRate:"7.9%",buyNum:27,
       top:[["Can my partner share the same memory? 家里两个人用一台够吗？",286],["这个能直接同步到 Notion 吗？",154],["Where did you get it? 主页链接点进去是中文站。",132]],
-      gap:[["跨账号／家庭共享","评论 34 条提及 · 素材 0 条"],["第三方笔记同步","评论 28 条提及 · 素材 0 条"],["区域语言与落地页","评论 19 条提及 · 素材 1 条"]]},
+      gap:[["跨账号／家庭共享","评论 34 条提及 · 素材 0 条","补设备共享与账号边界的可见演示"],["第三方笔记同步","评论 28 条提及 · 素材 0 条","补同步到第三方笔记的完整操作路径"],["区域语言与落地页","评论 19 条提及 · 素材 1 条","补区域语言与落地页一致性的说明"]]},
     creators:{bench:[["@everyday_note","生活记录","1.1M 粉","Instagram","结果先行 · 真人","品牌背书"],["@week_trace","周复盘","640K 粉","Instagram","录屏 · 教程","KOC 引入"],["@remind_kit","效率工具","420K 粉","Instagram","清单 · 教程","寄样合作"],["@onepage","极简生活","280K 粉","Instagram","操作演示 · 日常","寄样合作"],["@day30","挑战记录","190K 粉","Instagram","结果先行 · 实测","KOC 引入"]]}
   },
   reddit:{
@@ -739,7 +809,7 @@ const PLAT={
     comments:{got:280,total:830,intent:[["使用疑问",33],["正向反馈",24],["购买意图",18],["比较／竞品",14],["负面／质疑",11]],
       buyRate:"6.8%",buyNum:19,
       top:[["Does it store everything locally, or is it on your servers?",214],["How is this different from just using a voice memo app?",178],["Any plans for a self-hosted / offline mode?",141]],
-      gap:[["数据存储与隐私","评论 62 条提及 · 素材 1 条"],["与语音备忘的差异","评论 44 条提及 · 素材 0 条"],["离线／自托管","评论 27 条提及 · 素材 0 条"]]},
+      gap:[["数据存储与隐私","评论 62 条提及 · 素材 1 条","补「本地 / 服务端」存储边界的可见演示"],["与语音备忘的差异","评论 44 条提及 · 素材 0 条","补与语音备忘的单点对比"],["离线／自托管","评论 27 条提及 · 素材 0 条","补离线与自托管能力的边界说明"]]},
     creators:{bench:[["u/logkeeper","个人记忆记录","8.6K 净票","Reddit","结果先行 · 长帖","KOC 引入"],["u/gadgetprobe","数码实测","6.2K 净票","Reddit","实测 · 长帖","寄样合作"],["u/productivity","效率方法","4.8K 净票","Reddit","提问 · 讨论","品牌背书"],["u/adhdnotes","ADHD 实用向","3.4K 净票","Reddit","故事 · 长帖","KOC 引入"],["u/privacymind","隐私评测","2.7K 净票","Reddit","对比 · 数据","寄样合作"]]}
   },
   facebook:{key:"facebook",name:"Facebook",on:false,reason:"Facebook · 本期未开通",
@@ -749,7 +819,19 @@ const PLAT={
   xhs:{key:"xhs",name:"小红书",on:false,reason:"小红书 · 本期未开通",
     lines:[["为什么未开通","客户本期为北美英文市场投放，未开通小红书；且小红书白号不支持挂链，无法算到点击与到站。"],
       ["开通后能看到什么","内容量与互动、观看深度部分可得；点击与到站不可得（白号不挂链），只能做内容表现层对比。"],
-      ["需要什么才能开通","账号与服务商授权、目标市场确认（中文站或英文站）；挂链能力需单独评估。"]]}
+      ["需要什么才能开通","账号与服务商授权、目标市场确认（中文站或英文站）；挂链能力需单独评估。"]]},
+  x:{key:"x",name:"X",on:false,reason:"X · 本期未开通",
+    lines:[["为什么未开通","本期客户只开放了 TikTok、Instagram、Reddit 三个平台；X 主页读取权限与接口访问未确认。"],
+      ["开通后能看到什么","帖子曝光与互动、主页 bio 挂链带来的账号级点击与到站；单帖归因不可得。"],
+      ["需要什么才能开通","主页读取授权 ＋ 主页挂链入口确认 ＋ 站内事件回传口径确认，三者到齐后排期采集。"]]},
+  youtube:{key:"youtube",name:"YouTube",on:false,reason:"YouTube · 本期未开通",
+    lines:[["为什么未开通","本期客户只开放了 TikTok、Instagram、Reddit 三个平台；YouTube 频道读取授权未确认。"],
+      ["开通后能看到什么","频道内容量、观看时长与互动、观看深度；但 YouTube 无法挂链，点击与到站仍不可得，只能做内容与观看表现层。"],
+      ["需要什么才能开通","频道读取授权（或服务商账号）＋ 站内事件回传口径确认；挂链能力不在 YouTube 侧提供，需另议。"]]},
+  linkedin:{key:"linkedin",name:"LinkedIn",on:false,reason:"LinkedIn · 本期未开通",
+    lines:[["为什么未开通","本期客户只开放了 TikTok、Instagram、Reddit 三个平台；LinkedIn 主页读取权限与挂链入口未确认。"],
+      ["开通后能看到什么","主页内容量、曝光与互动、主页 bio 挂链的账号级点击；同样不承诺单帖归因。"],
+      ["需要什么才能开通","主页读取授权 ＋ 主页挂链入口确认 ＋ 站内事件回传口径确认。"]]}
 };
 /* 内容要素编码（抽 24 条中的代表条） */
 const ELEM={
@@ -772,13 +854,33 @@ const ELMED={
   instagram:{open:"故事（31%）",struct:"单点（40%）",demo:"真人拍摄（30%）",cover:"数字（46%）",dur:"30 秒内（58%）",cta:"结尾 · 主页（52%）",lang:"字幕 · 英语（66%）",density:"4.8 点/分"},
   reddit:{open:"结果先行（35%）",struct:"复盘（34%）",demo:"图文长帖（100%）",cover:"实拍图（48%）",dur:"图文（100%）",cta:"正文 · UTM（62%）",lang:"英语（92%）",density:"4.3 点/分"}
 };
+/* 主题→机制→必须补的证据（人工拆解，非数据） */
+const MECH_THEME={
+  "Use Case":{mech:"结果先行：开场 3 秒给成品，再回放一次可核验的操作",need:"真实使用场景录屏、原始片段与「找不到」时的边界说明"},
+  "Tutorial":{mech:"清单/流程：把操作拆成 3 步，屏幕录制为主",need:"完整操作路径、失败分支与第三方对接截图"},
+  "Pain Point":{mech:"问题开场：先复述困扰，再给一次可核验的演示",need:"真实困扰来源与适用边界的事实说明"},
+  "Review":{mech:"故事/复盘：把零散片段串成一条时间线",need:"实拍素材与可回溯的记录时间戳"}
+};
+/* 参考条→机制拆解（人工拆解，非数据） */
+const MECH_REF={
+  "结果先行":{order:"先给成品/结论 → 再演示过程 → 收尾给行动引导",borrow:"开头 3 秒内先呈现「跑出来的样子」，把演示留给中段",adapt:"用「这一周它替我记住了什么」直接给成品，再回放一次操作",need:"实测录屏与原始片段；无法核验的效果不写"},
+  "操作演示":{order:"逐键演示操作路径 → 展示结果",borrow:"把抽象能力落成可见的几步操作",adapt:"用 3 步演示「问一句 → 核对 → 导出」",need:"完整操作路径、失败分支与第三方对接截图"},
+  "清单开场":{order:"先说「有 N 个方法」 → 逐个演示",borrow:"用清单降低理解成本",adapt:"用「整理一周记录的 3 个问法」开场",need:"每个问法的真实输入与输出"},
+  "提问":{order:"用一个真实问题开门 → 给判断依据",borrow:"问题本身就是用户的搜索词",adapt:"用「它到底替我省了什么」开场",need:"真实困扰来源与适用边界"},
+  "对比":{order:"并列多个方案 → 给取舍结论",borrow:"对比式内容天然带决策意图",adapt:"用「与语音备忘的差别」做单点对比",need:"对比口径与适用条件"},
+  "实测":{order:"先给实测条件 → 再看结果",borrow:"把条件写清，结果才可信",adapt:"标注测试时长与使用场景后再给结论",need:"测试条件、原始记录与时间戳"},
+  "故事":{order:"按时间线讲一段经历 → 收在一句总结",borrow:"故事线能承载较长的观看",adapt:"把一周的记录串成一条时间线",need:"实拍素材与可回溯的时间戳"}
+};
 /* 覆盖缺口声明 */
 const GAPS={
   tiktok:["TikTok 白号 280 条不挂链：本期无点击与到站口径，不把白号曝光并入转化分母。","激活与询盘来自客户回传，T+2 到位；首充未回填，显示 NA（待客户确认口径）。","Facebook 与小红书本期未开通，不出现在任何跨平台合计里。"],
   instagram:["Instagram 主页挂链只能到账号级点击：不承诺单帖归因，单帖页不列点击与注册。","激活与询盘来自客户回传，T+2 到位；首充未回填，显示 NA（待客户确认口径）。","字段覆盖率 95.6%：其余 4.4% 待授权回传，缺口不补数。"],
   reddit:["Reddit 无「观看深度」字段：帖不适用完播／留存，故不列该项。","激活与询盘来自客户回传，T+2 到位；首充未回填，显示 NA（待客户确认口径）。","覆盖率 100%：84 条发布全部回传。"],
   facebook:["Facebook 本期未开通：不猜数、不估算、不拿 0 顶数。"],
-  xhs:["小红书本期未开通：白号不挂链，即便开通也无法算到点击与到站。"]
+  xhs:["小红书本期未开通：白号不挂链，即便开通也无法算到点击与到站。"],
+  x:["X 本期未开通：不猜数、不估算、不拿 0 顶数。"],
+  youtube:["YouTube 本期未开通：不猜数、不估算、不拿 0 顶数。"],
+  linkedin:["LinkedIn 本期未开通：不猜数、不估算、不拿 0 顶数。"]
 };
 /* 口径字典（数据来源与口径页） */
 const DICT=[
@@ -811,7 +913,7 @@ const VTITLE={overview:["分析 / 平台总览","平台总览"],accounts:["分�
   hot:["分析 / 热门与竞品","热门与竞品"],creators:["分析 / 达人与账号","达人与账号"],
   feedback:["分析 / 用户反馈","用户反馈"],report:["分析 / 报告与下一轮","报告与下一轮"],sources:["分析 / 数据来源与口径","数据来源与口径"]};
 
-let STATE={view:"overview",pkg:"full",platform:"tiktok",period:"current"};
+let STATE={view:"overview",pkg:"full",platform:"tiktok",period:"current",ftrack:"organic"};
 const PENDING=[];const TAB={};
 function addChart(id,build){PENDING.push({id,build});return '<div class="cv" data-cv="'+id+'"></div>';}
 function mountCharts(){
@@ -1091,7 +1193,7 @@ function viewCategories(p){
   const layerRows=[['形态层',p.catForm.map(x=>x[0]+' '+x[1]).join(' · '),'与平台一一对应'],
     ['手法层',p.catHand.map(x=>x[0]).join(' · '),'5 类'],
     ['主题层',p.catTheme.map(x=>x[0]+' '+x[1]).join(' · '),'6 类'],
-    ['平台层','TikTok 336 · Instagram 180 · Reddit 84','YT / FB / X / LinkedIn 本期未开通']];
+    ['平台层','TikTok 336 · Instagram 180 · Reddit 84','开通 3：TikTok · Instagram · Reddit；未开通 5：Facebook · X · YouTube · LinkedIn · 小红书']];
   const lc=[{k:'l',label:'分类层',type:'str',w:'100px'},{k:'v',label:'取值与计数',type:'str'},{k:'n',label:'备注',type:'str',w:'210px'}];
   const lt=mountTable('ct-layer',lc,layerRows.map(r=>({l:r[0],v:r[1],n:r[2]})));
   const th=addChart('ct-theme',w=>hbar({id:'ct-theme',w:w,x0:120,x1:w-120,rows:p.catTheme.map(x=>({label:x[0],value:x[1],disp:nf(x[1])+' 条'})),aria:'主题分布'}));
@@ -1100,6 +1202,43 @@ function viewCategories(p){
       '四层取值合计对齐：主题层 '+p.catTheme.reduce((a,c)=>a+c[1],0)+' 条 ＝ 手法层 '+p.catHand.reduce((a,c)=>a+c[1],0)+' 条 ＝ 发布 '+p.posts+' 条。','<span class="src pub">发布侧</span>')+
     cb('主题层分布 · '+p.name,'横向条 · 按条数降序',th,
       '主题层按发布条数计；每类样本 ≥14 条，均达到出结论阈值（≥50 条为打标操作提示，非可信度门槛）。','<span class="src pub">发布侧</span>'));
+  /* ── 迁移 · 主题×开头 交叉矩阵 + 分布 + 机制 + 变量 ── */
+  const enc=p.posts_sample.filter(r=>ELEM[r.id]).map(r=>({row:r,cat:r.cat,open:ELEM[r.id].open,play:parseFloat(String(r.play).replace(/,/g,''))||null}));
+  const themes=[],hooks=[];
+  enc.forEach(r=>{if(themes.indexOf(r.cat)<0)themes.push(r.cat);if(hooks.indexOf(r.open)<0)hooks.push(r.open);});
+  const encAll=enc.map(r=>r.play).filter(v=>v!=null);
+  const platMed=quantile(encAll,.5);
+  const crossCells=themes.map(t=>hooks.map(h=>{
+    const g=enc.filter(r=>r.cat===t&&r.open===h);
+    if(!g.length)return {n:0};
+    const med=quantile(g.map(r=>r.play).filter(v=>v!=null),.5);
+    return {n:g.length,disp:med!=null?nf(med):'—',ratio:(med!=null&&platMed)?fm(med/platMed,2)+'×':null,rep:g[0].row};
+  }));
+  const uUnit=p.unit==='曝光'?'曝光':'播放';
+  const mx=cb('主题 × 开头 交叉矩阵（抽检编码样本）','单元格＝该主题×该开头的中位'+uUnit+' · 倍数相对本平台抽检样本中位 · 有样本的单元格可点下钻',
+    matrixGrid({id:'ct-cross',labelW:96,cols:hooks,rows:themes,cells:crossCells}),
+    '样本 n＝'+enc.length+' 条（本平台 '+p.posts_sample.length+' 条抽检中已编码 '+enc.length+' 条）；空单元格＝该组合本期无编码样本，不补数。','<span class="src pub">发布侧</span> <span class="src plat">平台侧</span>');
+  const hookGroups=hooks.map(h=>({name:h,values:enc.filter(r=>r.open===h).map(r=>r.play)}));
+  const maxV=Math.max.apply(null,encAll.length?encAll:[1]);
+  const bx=cb('按开头：表现分布（P10–P90 ＋ 中位 ＋ n）','箱体 P25–P75、细线 P10–P90、粗线中位 · 单位：'+uUnit+' · 抽检样本',
+    addChart('ct-box',w=>boxPlot({id:'ct-box',w:w,groups:hookGroups,xMax:Math.ceil(maxV*1.06),
+      ticks:[0,Math.round(maxV*0.25),Math.round(maxV*0.5),Math.round(maxV*0.75),maxV],tickFmt:v=>v>=1000?nf(v/1000)+'k':nf(v),aria:'按开头的表现分布'}))+
+      '<div class="legend"><span class="lgitem"><span class="sw fill" style="background:'+G2+'"></span>P25–P75</span><span class="lgitem"><span class="sw" style="border-top-color:'+C1+'"></span>中位</span><span class="lgitem">细线 P10–P90 · 每组标 n</span></div>',
+    '每一条版本为一个样本点；样本量极小，个别组 n=1（箱体退化为一条线），只作观察。','<span class="src plat">平台侧</span>');
+  const caveat='<div class="noteblock warn"><b>本期不足以出结论</b>：交叉矩阵与分布只用「抽检编码样本」（本平台 '+enc.length+' 条），远低于「≥50 条才出结论」的阈值；n 过小、倍数仅供观察。要出可复测结论，需发布侧补齐<b>全批每一条版本的主题与开头标签</b>。</div>';
+  b+=sect('交叉','CROSS','再把主题和开头交叉起来看','单列排序看不出组合；交叉起来才能提出「同主题换开头」这类可测变量。',mx+bx+caveat);
+  const mechRows=themes.map(t=>{const m=MECH_THEME[t]||{mech:'—',need:'—'};return {t:t,m:m.mech,n:m.need};});
+  const mechT=cb('主题 → 内容机制 → 必须补的证据','借机制、不搬数字；每条机制都要一条可核验的证据',
+    mountTable('ct-mech',[{k:'t',label:'主题',type:'str',w:'130px'},{k:'m',label:'内容机制（可复用的做法）',type:'str'},{k:'n',label:'必须补的证据',type:'str',w:'290px'}],mechRows,false),
+    '机制来自抽检样本与平台侧公开内容的人工拆解；证据列写清下一批必须补的素材，未核实的不写进结论。','<span class="src pub">发布侧</span>');
+  const varRows=[
+    {f:'抽检样本里「结果先行」的'+uUnit+'中位高于其他开头',v:'同主题同时长，仅更换开头（结果先行 vs 问题开场）',m:uUnit+'中位数 · 3 秒留存'},
+    {f:'主题条数与表现不成正比（条数多的主题未必中位高）',v:'保持主题不变，只增加一次可核验的演示动作',m:'互动率 · 到站率'},
+    {f:'编码样本未覆盖全部主题×开头组合',v:'补齐全批每一条版本的主题与开头标签（≥50 条）',m:'交叉矩阵的样本 n 与可信度'}];
+  const varT=cb('发现 → 下一批可验证变量','一次只改一个变量；每条都写清测什么',
+    mountTable('ct-var',[{k:'f',label:'发现（仅观察，不下因果）',type:'str'},{k:'v',label:'下一批可验证的变量',type:'str',w:'260px'},{k:'m',label:'复测指标',type:'str',w:'190px'}],varRows,false),
+    '本表是「内容分类专用」的变量清单；报告页的「每期最多 3 项动作」是本期动作，两处用途不同。','<span class="src pub">发布侧</span>');
+  b+=sect('变量','VARIABLE','再把机制拆开、把发现变成变量','借的是机制，不是数字；给的是变量，不是结论。',mechT+varT);
   return b;
 }
 
@@ -1142,6 +1281,19 @@ function viewHot(p){
   b+=cb('要素分布 · 头部内容 vs 赛道基准','单位为占比 % · 分母：赛道 120 条 · 与内容分析同一套要素编码',
     dch+'<div class="legend"><span class="lgitem"><span class="sw fill" style="background:'+C1+'"></span>头部内容</span><span class="lgitem"><span class="sw fill" style="background:'+G3+'"></span>赛道基准（全部 120 条）</span></div>',
     '头部内容里 <b>「'+p.hotHead[0][0]+'」明显高于赛道基准</b>——这个赛道的头部表达高度集中。','<span class="src plat">平台侧</span>');
+  const encH=p.posts_sample.filter(r=>ELEM[r.id]).map(r=>ELEM[r.id].open);
+  const hooksAll=[];p.hotHead.forEach(h=>{if(hooksAll.indexOf(h[0])<0)hooksAll.push(h[0]);});encH.forEach(h=>{if(hooksAll.indexOf(h)<0)hooksAll.push(h);});
+  const HCOL=hooksAll.map((_,i)=>[C1,C2,C3,C4,C5,C6][i%6]);
+  const myN=encH.length;
+  const cntH=h=>encH.filter(x=>x===h).length;
+  const stackRows=[
+    {name:'我方（抽检 '+myN+' 条）',total:myN,sub:'抽检样本 · 非全批',seg:hooksAll.map((h,i)=>({v:cntH(h),color:HCOL[i],label:Math.round(100*cntH(h)/(myN||1))+'%'})),right:'n='+myN},
+    {name:'赛道头部（120 条）',total:100,sub:'平台侧公开 · 近 30 日',seg:hooksAll.map((h,i)=>({v:(p.hotHead.find(x=>x[0]===h)||[0,0])[1],color:HCOL[i],label:(p.hotHead.find(x=>x[0]===h)||[0,0])[1]+'%'})),right:'n=120'},
+    {name:'赛道整体（120 条）',total:100,sub:'平台侧公开 · 全样本',seg:hooksAll.map((h,i)=>({v:(p.hotAll.find(x=>x[0]===h)||[0,0])[1],color:HCOL[i],label:(p.hotAll.find(x=>x[0]===h)||[0,0])[1]+'%'})),right:'n=120'}];
+  const stk=addChart('hot-stack',w=>stackBars({id:'hot-stack',w:w,x0:190,x1:w-160,rows:stackRows}));
+  b+=cb('对象 × 开头 · 100% 堆叠柱','三行各自归一化 · 我方为抽检样本（n 小），赛道为近 30 日公开样本',
+    stk+legend('hot-stack',hooksAll.map((h,i)=>({label:h,color:HCOL[i],style:'fill'}))),
+    '我方开口分布只来自抽检编码的 '+myN+' 条，n 过小、不足以出结论；赛道两行来自公开编码的 120 条。三行并列只为看结构差异，不合并计数、不下因果。','<span class="src plat">平台侧</span>');
   b=sect('趋势','TREND','先看赛道头部在用什么表达','公开热门内容按同一套四层分类编码，先给分布与基准线。',b);
   const cc=mountTable('hot-cmp',[{k:'label',label:'要素',type:'str',w:'210px'},{k:'mine',label:'我的内容',type:'str',w:'120px'},
     {k:'track',label:'赛道基准',type:'str',w:'120px'},{k:'gap',label:'差',type:'str',w:'96px',nosort:1,disp:r=>'<span class="tag ok">'+esc(r.gap)+'</span>'}],
@@ -1149,11 +1301,27 @@ function viewHot(p){
   const cols=[{k:'rank',label:'#',num:1,type:'num',w:'42px'},{k:'title',label:'内容',type:'str'},{k:'acct',label:'账号',type:'str',w:'128px'},
     {k:'play',label:p.unit==='曝光'?'净票':'播放',num:1,type:'str',big:1},{k:'open',label:'开头类型',type:'str',w:'96px'},
     {k:'dur',label:'时长',type:'str',w:'90px'},{k:'collect',label:'采集时间',type:'str',w:'104px'}];
-  const bt=mountTable('hot-board',cols,p.hotBoard.map(r=>({...r})) ); 
+  const bt=mountTable('hot-board',cols,p.hotBoard.map(r=>({...r,_drawer:{kind:'ref',row:r}})),true);
   b+=sect('明细','DETAIL','我的内容 vs 赛道，再看榜单','榜单带样本量与来源；全部为平台侧公开数据，不依赖客户回传。',
     cb('我的内容 vs 赛道 · 要素对照','逐要素对照 · 差列＝我的减赛道',cc,'赛道为平台侧公开数据；我的内容来自本项目同批。','<span class="src plat">平台侧</span>')+
     cb('赛道热门榜单 · 近 30 日','样本 120 条 · 采集 2026-10-13 · 来源：平台侧公开数据',bt,
-      '榜单口径：平台侧公开内容；样本量与采集时间见表头与标题。','<span class="src plat">平台侧</span>'));
+      '榜单口径：平台侧公开内容；样本量与采集时间见表头与标题。点击任意一行可下钻看机制拆解。','<span class="src plat">平台侧</span>'));
+  const mechRef=[
+    {o:'赛道头部 · 结果先行型',m:'开场即成品，演示放中段',a:'用「这一周它替我记住了什么」直接给成品',n:'实测录屏与原始片段；无法核验的效果不写'},
+    {o:'赛道头部 · 操作演示型',m:'逐键演示操作路径',a:'用 3 步演示「问一句 → 核对 → 导出」',n:'完整操作路径、失败分支与第三方对接截图'},
+    {o:'赛道头部 · 提问开场型',m:'用一个真实问题开门见山',a:'用「它到底替我省了什么」开场',n:'真实困扰来源与适用边界的事实说明'},
+    {o:'赛道头部 · 对比型',m:'并列多个方案后给取舍',a:'用「与语音备忘的差别」做单点对比',n:'对比口径与适用条件'}];
+  const mcRows=cb('哪些内容机制值得借鉴','借机制、不搬数字；参照对象为匿名合成演示对象，非真实竞品品牌',
+    mountTable('hot-mech',[{k:'o',label:'参照对象',type:'str'},{k:'m',label:'有用的机制',type:'str'},{k:'a',label:'给本产品的新表达',type:'str'},{k:'n',label:'必须补的证据',type:'str',w:'230px'}],mechRef,false),
+    '每条只给改编方向与要补的证据；不把参照对象的播放量搬成我方效果承诺。','<span class="src pub">发布侧</span> <span class="src plat">平台侧</span>');
+  const varRows=[
+    {f:'头部「'+p.hotHead[0][0]+'」占比 '+p.hotHead[0][1]+'%，高于赛道整体 '+p.hotAll[0][1]+'%',v:'下一批把「'+p.hotHead[0][0]+'」开头配额提高，做单变量 A/B',m:'开头 3 秒留存 · 互动率'},
+    {f:'赛道头部时长集中在 30 秒内',v:'同主题分别做 30 秒内 / 30–60 秒两版',m:'播放中位数 · 完播（如可得）'},
+    {f:'我方在「'+p.hotCmp[2][0]+'」上领先赛道（'+p.hotCmp[2][1]+' vs '+p.hotCmp[2][2]+'）',v:'维持该要素，单独测试行动引导位置',m:'到站率 · 注册率'}];
+  const varT=cb('发现 → 下一批可验证变量','一次只改一个变量；每条都写清测什么',
+    mountTable('hot-var',[{k:'f',label:'发现（仅观察，不下因果）',type:'str'},{k:'v',label:'下一批可验证的变量',type:'str',w:'260px'},{k:'m',label:'复测指标',type:'str',w:'190px'}],varRows,false),
+    '赛道结论只用于提出我方要测的变量，不直接搬成承诺。','<span class="src plat">平台侧</span>');
+  b+=sect('变量','VARIABLE','再看哪些机制可借、下一批测什么','借机制、给变量，不搬数字。',mcRows+varT);
   return b;
 }
 
@@ -1180,19 +1348,46 @@ function viewCreators(p){
 }
 
 function viewFeedback(p){
+  const cur=STATE.ftrack||'organic';
+  const tabs='<div class="seg-tabs"><button class="tab'+(cur==='organic'?' on':'')+'" data-ftrack="organic" type="button">自然用户反馈</button>'+
+    '<button class="tab'+(cur==='campaign'?' on':'')+'" data-ftrack="campaign" type="button">评论回流（社媒截流）</button></div>';
+  return tabs+(cur==='campaign'?feedbackCampaign(p):feedbackOrganic(p));
+}
+function feedbackOrganic(p){
   const c=p.comments;
   let b='';
+  b+='<div class="noteblock cust"><b>服务方回复 · 已排除 · 不计为自然口碑</b>（对外口径逐字）。本轨只收自然用户评论；品牌账号自己的回复不进入任何比率的分母，也不冒充独立用户评价。自然问题用来改内容；「评论回流」是另一条服务轨，两者分开核算、数据不合并。</div>';
   const ih=addChart('fb-intent',w=>hbar({id:'fb-intent',w:w,x0:130,x1:w-130,rows:c.intent.map(x=>({label:x[0],value:x[1],disp:x[1]+'%'})),aria:'评论意图分布'}));
   b+=cb('评论意图分布','单位为占比 % · 已采集 '+nf(c.got)+' / 总 '+nf(c.total)+' 条评论 · 分母：已采集 '+nf(c.got)+' 条',ih,
     '购买意图独立成类（<b>'+c.intent[2][1]+'%</b>）；使用疑问最多，指向「怎么用」的内容缺口。','<span class="src plat">平台侧</span>');
   b=sect('趋势','TREND','先看意图结构，再看原话与缺口','所有比率标「已采集 X / 总 Y ＋ 时间窗 ＋ 采样与分类方法」。',b);
   const topHtml=c.top.map(t=>'<div class="panel" style="margin-bottom:12px"><p style="color:#111827">「'+esc(t[0])+'」</p><p style="font-size:var(--fs-axis);color:#6B7280">该条 '+nf(t[1])+' 赞 · '+esc(p.name)+'</p></div>').join('');
-  const rq=mountTable('fb-req',[{k:'topic',label:'需求缺口主题',type:'str'},{k:'sig',label:'信号量',type:'str',num:1,big:1}],c.gap.map(x=>({topic:x[0],sig:x[1]})));
-  b+=sect('明细','DETAIL','再看原话与需求缺口','高赞原话与需求缺口都回链平台侧公开评论，不改写。',
+  const rq=mountTable('fb-req',[{k:'topic',label:'需求缺口主题',type:'str'},{k:'sig',label:'信号量',type:'str',num:1,big:1},{k:'act',label:'具体内容动作',type:'str',w:'290px'}],c.gap.map(x=>({topic:x[0],sig:x[1],act:x[2]||'—'})));
+  b+=sect('明细','DETAIL','再看原话与需求缺口','高赞原话与需求缺口都回链平台侧公开评论，不改写；缺口主题直接配一条内容动作。',
     TOPDOM(topHtml)+
-    cb('需求缺口 · 评论信号 vs 素材供给','信号＝评论提及条数；素材供给为本期条数',rq,
+    cb('需求缺口 · 评论信号 vs 素材供给 vs 内容动作','信号＝评论提及条数；素材供给为本期条数',rq,
       '购买意图词（where to buy / link 类）提及率 <b>'+c.buyRate+'</b>（'+c.buyNum+' / '+nf(c.got)+'）；三个缺口主题的素材供给为 0，是最便宜的补量机会。','<span class="src plat">平台侧</span>'));
+  const varRows=[
+    {f:'购买意图独立成类（提及率 '+c.buyRate+'）',v:'为需求缺口主题各补一条内容',m:'相关主题评论追问率 · 注册率'},
+    {f:'三个需求缺口主题的素材供给为 0',v:'补「导出 / 共享 / 购买入口」三类素材各 1 条',m:'对应评论主题的提及量变化'},
+    {f:'评论为抽样（≤30%）',v:'扩样到全量后再出结论',m:'意图分类分布的稳定性'}];
+  const varT=cb('发现 → 下一批可验证变量','一次只改一个变量；每条都写清测什么',
+    mountTable('fb-var',[{k:'f',label:'发现（仅观察，不下因果）',type:'str'},{k:'v',label:'下一批可验证的变量',type:'str',w:'260px'},{k:'m',label:'复测指标',type:'str',w:'190px'}],varRows,false),
+    '自然反馈的回答是「改哪条内容」；与评论回流服务轨的动作分开记。','<span class="src plat">平台侧</span>');
+  b+=sect('变量','VARIABLE','再把问题变成下一批变量','借用户的问法，给下一批要测的变量。',varT);
   return b;
+}
+function feedbackCampaign(p){
+  return '<div class="statepanel"><div class="sh"><span class="tag off">本期未接入</span>'+
+   '<span class="crumb" style="margin:0">服务轨 · 评论回流（社媒截流）</span></div>'+
+   '<h2>评论回流轨 · 本期未接入</h2>'+
+   '<p>评论回流是与内容发布并行的另一条服务线（对外类目：<b>社媒截流</b>）。本 Demo 只演示内容侧的分析口径；评论回流轨本期无执行数据，按约定不猜数、不估算、不拿 0 顶数——所以这里没有漏斗、没有明细表，也不另出一组 KPI。</p>'+
+   '<div class="cols"><div><dt>上方 KPI 属于自然轨</dt><dd>页面上方三格 KPI（购买意图占比／提及率／已采集评论）是「自然用户反馈」轨的量，不是评论回流的执行数。</dd></div>'+
+   '<div><dt>怎么开通</dt><dd>作为独立服务线单买。开通后并入本页第二轨，仍保留「执行任务 → 复核可见 → 获得后续回复」每一步的原分母。</dd></div>'+
+   '<div><dt>与内容线的边界</dt><dd>评论回流回答「在哪里、按什么频率做触达」；内容分析回答「内容跑成什么样」。两条线平台不同、计量不同，数据不合并。</dd></div></div>'+
+   '<div class="cols" style="margin-top:16px"><div><dt>口径声明</dt><dd>服务方回复已排除，不计为自然口碑；品牌账号回复不冒充独立用户评价。</dd></div>'+
+   '<div><dt>接入后需要什么</dt><dd>评论／回复明细 CSV：发布时间、内容摘要、目标页面 URL、所属平台。</dd></div>'+
+   '<div><dt>覆盖平台另一列</dt><dd>评论回流覆盖的平台是「18+ 主流海外社媒与社区」，与内容矩阵 8 个平台是两套口径，见「数据来源与口径」页。</dd></div></div></div>';
 }
 function TOPDOM(topHtml){
   return '<div class="cols-3" style="margin-top:16px">'+topHtml+'</div>';
@@ -1236,9 +1431,9 @@ function viewReport(p){
     {lv:'A',name:'数据交付件',form:'看板 ＋ 明细导出（长期可用）',
       who:'每天要看数、要自己拉数做表的人',price:'含在平台承载费'},
     {lv:'B',name:'周期分析报告',form:'文档件，周／双周／月一期，8–15 页',
-      who:'要拿去做汇报、要判断下一轮往哪投的人',price:'1,200 美元/份'},
+      who:'要拿去做汇报、要判断下一轮往哪投的人',price:'按份计价 · 口径另议'},
     {lv:'C',name:'深度专题',form:'文档件，一个专题 2–3 周',
-      who:'要回答一个更大的决策问题的人',price:'3,500–5,000 美元/专题'}
+      who:'要回答一个更大的决策问题的人',price:'按专题计价 · 口径另议'}
   ];
   const lvlCols=[{k:'lv',label:'级别',type:'str',w:'58px'},{k:'name',label:'报告名称',type:'str',w:'140px'},
     {k:'form',label:'交付形态',type:'str',w:'240px'},{k:'who',label:'谁需要',type:'str'},
@@ -1299,8 +1494,10 @@ function viewSources(p){
     {plat:'Instagram',n:'180 条',pub:OKK,play:OKK,eng:OKK,depth:WARN('部分'),click:['账号级 · 只到主页点击','warn'],land:OKK,reg:OKK,gran:['账号级（不可拆到单帖）','warn']},
     {plat:'Reddit',n:'84 条',pub:OKK,play:['可得 · 曝光／净票','ok'],eng:['可得 · 赞踩评','ok'],depth:['不适用','off'],click:['可得 · 帖内链接','ok'],land:OKK,reg:OKK,gran:['帖子级（可带 UTM）· 全案最细','ok']},
     {plat:'Facebook',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（不猜数、不顶 0）','off']},
-    {plat:'小红书',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（白号不挂链）','off']},
-    {plat:'YouTube',n:'不挂链',pub:OKK,play:OKK,eng:OKK,depth:OKK,click:NO,land:NO,reg:NO,gran:['白号／千粉号皆不挂链','off']}
+    {plat:'X',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（主页 bio 挂链，开通后才到账号级）','off']},
+    {plat:'YouTube',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（无法挂链，即开也无法到点击）','off']},
+    {plat:'LinkedIn',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（主页 bio 挂链，开通后才到账号级）','off']},
+    {plat:'小红书',n:'本期未开通',pub:CLOSED,play:CLOSED,eng:CLOSED,depth:CLOSED,click:CLOSED,land:CLOSED,reg:CLOSED,gran:['未开通（白号不挂链）','off']}
   ];
   const gc=[{k:'plat',label:'平台 / 号型',type:'str',w:'132px',nosort:1},{k:'n',label:'本期量',type:'str',w:'88px',nosort:1},
     {k:'pub',label:'发布事实',type:'str',nosort:1,disp:r=>G(r.pub[0],r.pub[1])},
@@ -1317,6 +1514,31 @@ function viewSources(p){
   b+=sect('闸门','GATE','先看哪个平台能算到哪一段','这张表是四种卖法数据量不同的根源：买不到的那一段，页面写「不可得」与原因，不写 0。',
     cb('平台 × 数据段闸门表','可得 · 不可得＝闸门未开 · 未开通＝本期无数据（不填 0）','<div>'+gt+'</div>'+gateNote,
       '闸门来源：各平台挂链能力与归因粒度；与顶部口径头、平台明细逐格对齐。','<span class="src plat">平台侧</span>'));
+  /* 平台两类：内容矩阵 vs 评论线（对外口径，两类不合并） */
+  const matrix8='Instagram · TikTok · Facebook · X · YouTube · LinkedIn · Reddit · 小红书';
+  const commentPlats='Instagram · TikTok · YouTube · Facebook · Twitter/X · LinkedIn · Reddit · WhatsApp · Telegram · Pinterest · Google · Quora · Discord · GitHub · Twitch · Snapchat · Threads · 小红书';
+  const capRows=[
+    {p:'Instagram',link:'主页 bio 修改',data:'播放 · 互动 · 主页点击（账号级）',st:'已开通',sc:'ok',src:'对外口径 · 平台侧'},
+    {p:'Twitter/X',link:'主页 bio 修改',data:'—',st:'本期未开通',sc:'off',src:'对外口径'},
+    {p:'TikTok',link:'白号无法挂链、千粉号走 tto 链接申请',data:'播放 · 互动 · 千粉号官方链接（单条级）',st:'已开通',sc:'ok',src:'对外口径 · 平台侧'},
+    {p:'Facebook',link:'主页 bio 修改',data:'—',st:'本期未开通',sc:'off',src:'对外口径'},
+    {p:'YouTube',link:'无法挂链',data:'—（不挂链则点击不可得）',st:'本期未开通',sc:'off',src:'对外口径'},
+    {p:'Reddit',link:'内容中带链接',data:'曝光 · 净票 · 帖内链接（帖子级）',st:'已开通',sc:'ok',src:'对外口径 · 平台侧'},
+    {p:'LinkedIn',link:'主页 bio 修改',data:'—',st:'本期未开通',sc:'off',src:'对外口径'},
+    {p:'Threads',link:'主页 bio 修改',data:'—',st:'本期未开通',sc:'off',src:'对外口径'},
+    {p:'小红书',link:'无法挂链',data:'—',st:'本期未开通',sc:'off',src:'对外口径'}];
+  const capCols=[{k:'p',label:'平台',type:'str',w:'104px',nosort:1},
+    {k:'link',label:'挂链能力（对外口径逐字）',type:'str',w:'240px',nosort:1},
+    {k:'data',label:'效果数据可得性',type:'str',nosort:1},
+    {k:'st',label:'本期状态',type:'str',w:'104px',nosort:1,disp:r=>'<span class="tag '+r.sc+'">'+esc(r.st)+'</span>'},
+    {k:'src',label:'来源',type:'str',w:'150px',nosort:1}];
+  const capT=cb('支持平台与挂链能力表','行＝平台；挂链能力逐字照抄对外口径，不改写；未开通不填数据',
+    mountTable('sc-cap',capCols,capRows,false),
+    '挂链能力为对外口径原文；效果数据可得性与「本期状态」对齐平台闸门表。Threads 在对外白号价表里出现，但不在本 Demo 的平台切换器内。','<span class="src plat">平台侧</span>');
+  const twoCat='<div class="cols" style="margin-top:16px">'+
+    '<div class="panel"><h4>内容矩阵平台（8 个）</h4><p>'+esc(matrix8)+'</p><p>本 Demo 的平台切换器就是这 8 个；已开通 3 个、未开通 5 个，逐个标明「未开通」与理由。</p></div>'+
+    '<div class="panel"><h4>社媒截流覆盖平台（评论线）</h4><p>'+esc(commentPlats)+'</p><p>对外自称「18+ 主流海外社媒与社区」，与内容矩阵平台<b>口径不同、数据不合并</b>：内容矩阵回答「内容发出去跑成什么样」，截流平台回答「在哪里、按什么频率做评论触达」。评论回流轨本期未接入，这里只列覆盖范围，不出执行数。</p></div></div>';
+  b+=sect('平台','PLATFORM','先把两类平台分清','内容矩阵 8 个平台 与 评论线覆盖平台，是两套口径，不能合并计数。',capT+twoCat);
   const cols=[{k:'m',label:'指标',type:'str',w:'128px'},{k:'s',label:'来源',type:'str',w:'120px',disp:r=>{const m=r.s;const cls=m.indexOf('客户')>=0?'cust':m.indexOf('发布')>=0?'pub':'plat';return '<span class="src '+cls+'">'+esc(m)+'</span>';}},
     {k:'d',label:'定义与分母',type:'str'},{k:'v',label:'本期取值',type:'str',w:'220px'}];
   const tbl=mountTable('sc-dict',cols,DICT.map(r=>({m:r[0],s:r[1],d:r[2],v:r[3]})));
@@ -1328,12 +1550,24 @@ function viewSources(p){
     GAPS.tiktok.concat(GAPS.instagram,GAPS.reddit).filter((v,i,a)=>a.indexOf(v)===i).map(x=>'<li>'+esc(x)+'</li>').join('')+
     '<li>Facebook 与小红书本期未开通：不猜数、不估算、不拿 0 顶数。</li></ul></div>';
   const coinPanel='<div class="panel"><h4>来源标注约定</h4><p><span class="src pub">发布侧</span> 内容版本与发布记录 · <span class="src plat">平台侧</span> 播放／曝光／互动／观看时长 · <span class="src cust">客户回传</span> 点击之后的站内事件（虚线＝待授权，不填 0、不估算）。</p>'+
-    '<p>四种买法 × 平台闸门：L1–L4 可跨平台比较（先标准化为中位数＋分布＋样本数）；L5 <b>不做跨平台合并求和</b>，因为归因粒度不同（TikTok 千粉号单条级、Instagram 账号级、Reddit 帖子级）。</p></div>';
+    '<p>四种买法 × 平台闸门：L1–L4 可跨平台比较（先标准化为中位数＋分布＋样本数）；L5 <b>不做跨平台合并求和</b>，因为归因粒度不同（TikTok 千粉号单条级、Instagram 账号级、Reddit 帖子级）。</p>'+
+    '<p>对外回传字段口径（逐字）：发送内容 url、播放数量、互动（点赞、收藏、分享）数量。</p></div>';
   const pkgPanel='<div class="panel"><h4>买法 × 数据量</h4><p><b>'+esc(pkg().name)+'</b>：'+esc(pkg().volume)+'</p>'+
     '<p>本期数据基线：内容版本 200 ｜发布 600 条（分发比 3.0）｜回传覆盖 586 / 600 · 97.7%。</p></div>';
   b+=sect('口径','DEF','先看字典，再看覆盖与来源','一处可查：字段清单、指标定义、缺失与不适用标注。',
     dictCb+'<div class="cols" style="margin-top:16px">'+gapPanel+coinPanel+pkgPanel+'</div>'+
     cb('回传覆盖率 · 各平台','计量条 · 缺口用斜纹表示',meters,'覆盖率＝回传发布记录 / 计划发布记录；缺口不补数。','<span class="src pub">发布侧</span>'));
+  /* 产品类目（对外 5 条，逐字），以及分析挂在哪条线上 */
+  const lines=['内容制作','矩阵发布','社媒截流','私信触达','KOC / KOL 建联'];
+  const lineNote={
+    '内容制作':'本 Demo 的「内容分类 / 单条内容 / 热门与竞品」主要落在这条线的数据上。',
+    '矩阵发布':'本 Demo 的「平台总览 / 账号与排期」主要落在这条线的数据上。',
+    '社媒截流':'对应本 Demo 的「评论回流轨」，本期未接入，只留空态。',
+    '私信触达':'本期未接入，不在本 Demo 的分析范围内。',
+    'KOC / KOL 建联':'本期未接入；「达人与账号」页只做平台侧公开候选池。'};
+  const lineCards='<div class="cols-3">'+lines.map((x,i)=>'<div class="panel"><h4>'+(i+1)+'. '+esc(x)+'</h4><p>'+esc(lineNote[x])+'</p></div>').join('')+'</div>';
+  const linePanel='<div class="panel" style="margin-top:16px"><h4>分析在哪条线上</h4><p>分析不是第 6 条产品线，而是横跨上述产品线的<b>搭配项</b>：可搭配数据分析看板使用，需另外收费。</p><p>对外五条产品线回答「我们卖哪几条服务」；本 Demo 回答「内容发出去跑成什么样、为什么、下一轮改什么」——后者是叠加在内容制作与矩阵发布上的分析能力。</p></div>';
+  b+=sect('类目','LINE','再看我们在卖哪几条线、分析在哪条线上','对外五条产品线的类目名逐字照抄；分析是搭配项，不是第 6 条线。',lineCards+linePanel);
   return b;
 }
 
@@ -1356,7 +1590,7 @@ function renderNav(){
 function renderCtx(){
   const p=plat();
   let platChips='<span class="switch">';
-  ['tiktok','instagram','reddit','facebook','xhs'].forEach(k=>{
+  ['instagram','tiktok','facebook','x','youtube','linkedin','reddit','xhs'].forEach(k=>{
     const q=PLAT[k],on=STATE.platform===k?' on':'',off=q.on?'':' off';
     platChips+='<button class="chip'+on+off+'" data-plat="'+k+'" type="button">'+esc(q.name)+(q.on?'':'（未开通）')+'</button>';
   });
@@ -1497,6 +1731,10 @@ document.addEventListener('click',e=>{
   const row=e.target.closest('tr[data-tbl]');
   if(row){const t=TAB[row.dataset.tbl];if(!t||!t.click)return;const r=t.rows[+row.dataset.i];
     if(r&&r._drawer){openDrawer(r._drawer);}return;}
+  const mx=e.target.closest('[data-mx]');
+  if(mx){const info=MX[mx.dataset.mx];if(info){const cell=(info.cells[+mx.dataset.i]||[])[+mx.dataset.j];if(cell&&cell.rep)openDrawer({kind:'ver',row:cell.rep});}return;}
+  const ft=e.target.closest('[data-ftrack]');
+  if(ft){STATE.ftrack=ft.dataset.ftrack;const y=window.scrollY;renderView();window.scrollTo(0,y);return;}
   const lg=e.target.closest('[data-lg]');
   if(lg){const id=lg.dataset.lg,k=lg.dataset.key;HIDDEN[id]=HIDDEN[id]||{};HIDDEN[id][k]=!HIDDEN[id][k];
     const y=window.scrollY;renderView();window.scrollTo(0,y);return;}
@@ -1511,7 +1749,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 /* 抽屉 */
 function openDrawer(d){
   const dr=document.getElementById('drawer');
-  dr.innerHTML=d.kind==='ver'?drawerVer(d):'';
+  dr.innerHTML=d.kind==='ver'?drawerVer(d):d.kind==='ref'?drawerRef(d):'';
   dr.classList.add('open');dr.setAttribute('aria-hidden','false');
   document.getElementById('scrim').classList.add('on');
 }
