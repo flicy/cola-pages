@@ -1350,13 +1350,11 @@ function renderCtx(){
   perChips+='</span>';
   const winTxt=STATE.period==='current'?CASE.window:STATE.period==='prev'?'2026-08-17 ~ 2026-09-13（4 周）':'2026-07-27 ~ 2026-10-18（近 12 周）';
   document.getElementById('ctxbar').innerHTML=
-    '<div class="ctxrow"><span class="casename">案例：'+esc(CASE.title)+'</span>'+
-    '<span class="sep" style="width:1px;height:18px;background:'+LINE+'"></span>'+
-    '<span>'+esc(CASE.market)+'</span><span class="dotsep">·</span>'+
+    '<div class="ctxrow">'+
     '<span>统计窗口 <b>'+esc(winTxt)+'</b></span><span class="dotsep">·</span>'+
     '<span>数据回传 <b>'+esc(CASE.tplus)+'</b></span><span class="dotsep">·</span>'+
     '<span>覆盖率 <b>'+CASE.cov.num+' / '+CASE.cov.den+' · '+CASE.cov.pct+'%</b></span>'+
-    '<span class="badge"><span class="bd"></span>合成演示数据 · 非真实客户实绩</span></div>'+
+    '<span class="badge"><span class="bd"></span>匿名案例 · 演示数据</span></div>'+
     '<div class="ctxrow ctxrow2"><span class="slab">买法</span>'+pkgChips+'<span class="vsep"></span>'+
     '<span class="slab">平台</span>'+platChips+'<span class="vsep"></span>'+
     '<span class="slab">周期</span>'+perChips+'</div>';
@@ -1370,7 +1368,7 @@ function renderHead(){
   else if(VL[v]&&!pkg().layers[VL[v]]){h1=t[1]+' · 本期不可得';lead='买法「'+pkg().name+'」不覆盖 '+(VL[v]==='L2'?'账号与排期':VL[v]==='L4'?'内容分类':'转化')+' 层；本页显式说明为什么买不到。';}
   else{lead=leads[p.key]&&leads[p.key][v]?leads[p.key][v]:'';}
   document.getElementById('pageHead').innerHTML='<div><div class="crumb">'+esc(crumb)+'</div><h1>'+esc(h1)+'</h1>'+
-    '<div class="ph-case">案例：'+esc(CASE.title)+' · '+esc(CASE.market)+' · '+esc(CASE.window)+' · 回传 <b>'+esc(CASE.tplus)+'</b> · 覆盖率 <b>'+CASE.cov.num+' / '+CASE.cov.den+' · '+CASE.cov.pct+'%</b> · 合成演示数据</div></div>'+
+    '<div class="ph-case">案例：'+esc(CASE.title)+' · '+esc(CASE.market)+' · '+esc(CASE.window)+' · 回传 <b>'+esc(CASE.tplus)+'</b> · 覆盖率 <b>'+CASE.cov.num+' / '+CASE.cov.den+' · '+CASE.cov.pct+'%</b> · 演示数据</div></div>'+
     (lead?'<div class="lead">'+lead+'</div>':'');
 }
 const leads={
@@ -1412,7 +1410,7 @@ function footnote(p){
     '<div class="fi"><span class="fk">来源标注</span><span class="src pub">发布侧</span> 内容版本与发布记录 · <span class="src plat">平台侧</span> 播放 / 曝光 / 互动 · <span class="src cust">客户回传</span> 点击之后的站内事件（虚线＝待授权，不填 0、不估算）。</div>'+
     '<div class="fi"><span class="fk">买法 · '+esc(pkg().name)+'</span>'+esc(pkg().desc)+'</div>'+
     '<div class="fi"><span class="fk">数据覆盖</span>'+(p.on?esc(p.name)+' 回传覆盖 '+p.cov[0]+' / '+p.cov[1]+' · '+covPct(p.cov)+'%；全案 586 / 600 · 97.7%。':'本期未开通。')+'缺任何一项证据的结论降级为观察。</div>'+
-    '<div class="wm">合成演示数据 · 非真实客户实绩<br>单文件离线 · 无外部依赖</div>';
+    '<div class="wm">匿名案例 · 演示数据（非真实客户实绩）</div>';
 }
 function renderView(){
   const p=plat(),v=STATE.view,el=document.getElementById('view');
